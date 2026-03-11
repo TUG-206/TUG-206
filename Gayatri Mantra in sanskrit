@@ -1,0 +1,644 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+================================================================================
+गायत्री मन्त्र - Gayatri Mantra
+Python Edition | Vedic Wisdom in Your Terminal
+================================================================================
+"""
+
+import os
+import sys
+import time
+import platform
+import random
+from datetime import datetime
+from typing import List, Dict, Tuple, Optional
+
+# ==============================================================================
+# COLOR SUPPORT (cross-platform)
+# ==============================================================================
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True)
+    COLORS_AVAILABLE = True
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Create dummy color classes
+    class Fore:
+        BLACK = RED = GREEN = YELLOW = BLUE = MAGENTA = CYAN = WHITE = ''
+        LIGHTBLACK_EX = LIGHTRED_EX = LIGHTGREEN_EX = LIGHTYELLOW_EX = ''
+        LIGHTBLUE_EX = LIGHTMAGENTA_EX = LIGHTCYAN_EX = LIGHTWHITE_EX = ''
+        RESET = ''
+    class Back:
+        BLACK = RED = GREEN = YELLOW = BLUE = MAGENTA = CYAN = WHITE = ''
+        LIGHTBLACK_EX = LIGHTRED_EX = LIGHTGREEN_EX = LIGHTYELLOW_EX = ''
+        LIGHTBLUE_EX = LIGHTMAGENTA_EX = LIGHTCYAN_EX = LIGHTWHITE_EX = ''
+        RESET = ''
+    class Style:
+        BRIGHT = DIM = NORMAL = RESET_ALL = ''
+
+# ==============================================================================
+# UNICODE SUPPORT CHECK
+# ==============================================================================
+def supports_unicode() -> bool:
+    """Check if terminal supports Unicode/Devanagari"""
+    if platform.system() == 'Windows':
+        return sys.stdout.encoding.lower() in ('utf-8', 'utf8')
+    return True
+
+# ==============================================================================
+# GAYATRI MANTRA DATA STRUCTURE
+# ==============================================================================
+class GayatriMantra:
+    """Complete data structure for Gayatri Mantra"""
+    
+    SANSKRIT = [
+        "ॐ भूर्भुवः स्वः",
+        "तत्सवितुर्वरेण्यं",
+        "भर्गो देवस्य धीमहि",
+        "धियो यो नः प्रचोदयात्॥"
+    ]
+    
+    TRANSLITERATION = [
+        "Om Bhūr Bhuvaḥ Svaḥ",
+        "Tat Savitur Vareṇyaṃ",
+        "Bhargo Devasya Dhīmahi",
+        "Dhiyo Yo Naḥ Prachodayāt"
+    ]
+    
+    WORD_MEANINGS = [
+        ("ॐ", "The Primordial Sound, Cosmic Energy"),
+        ("भूः", "Earth, Physical Existence"),
+        ("भुवः", "Atmosphere, Mental Realm"),
+        ("स्वः", "Heaven, Spiritual Realm"),
+        ("तत्", "That (Supreme Being)"),
+        ("सवितुः", "Of the Sun, Creator, Illuminator"),
+        ("वरेण्यम्", "Most Adorable, Worthy of Worship"),
+        ("भर्गः", "Divine Light, Radiance, Glory"),
+        ("देवस्य", "Of the Divine, of God"),
+        ("धीमहि", "We Meditate Upon, We Contemplate"),
+        ("धियः", "Intellect, Understanding, Wisdom"),
+        ("यः", "Who (The Supreme Being)"),
+        ("नः", "Our, To Us"),
+        ("प्रचोदयात्", "May Inspire, May Illuminate, May Guide")
+    ]
+    
+    INFO = {
+        "veda": ("वेदः", "ऋग्वेद (Rigveda)"),
+        "meter": ("छन्दः", "गायत्री (Gayatri - 24 syllables)"),
+        "deity": ("देवता", "सविता (Savita - Sun God)"),
+        "seer": ("ऋषिः", "विश्वामित्रः (Vishwamitra)"),
+        "tone": ("स्वरः", "षड्जः (Sadja)"),
+        "seed": ("बीजाक्षरम्", "ॐ (Om)")
+    }
+    
+    BENEFITS = [
+        ("🧠", "Enhances intelligence and memory"),
+        ("🧘‍♂️", "Brings mental peace and clarity"),
+        ("🛡️", "Provides spiritual protection"),
+        ("❤️", "Purifies the mind and heart"),
+        ("🌟", "Removes obstacles and negativity"),
+        ("💡", "Illuminates the path to self-realization"),
+        ("🎯", "Improves concentration and focus"),
+        ("✨", "Increases positive energy vibrations")
+    ]
+    
+    TIMES = [
+        ("🌅", "प्रातःकाल (Dawn - 4:00 AM to 8:00 AM)"),
+        ("☀️", "मध्याह्न (Noon - 12:00 PM to 2:00 PM)"),
+        ("🌇", "सायंकाल (Dusk - 4:00 PM to 6:00 PM)")
+    ]
+    
+    COMPLETE_MEANING = """
+    We meditate upon the spiritual effulgence of that adorable Supreme Divine Reality,
+    the Source of all three worlds - the physical (Bhūḥ), the astral (Bhuvaḥ) and 
+    the causal (Svaḥ) spheres. May that Divine Being (Savita) illuminate our intellect
+    and guide us on the righteous path.
+    
+    The Gayatri Mantra is considered the essence of all four Vedas and the most sacred
+    mantra in Sanatan Dharma. It is addressed to the Sun God (Savita) as the symbol of
+    divine light and wisdom that dispels the darkness of ignorance.
+    """
+
+# ==============================================================================
+# TERMINAL UTILITIES
+# ==============================================================================
+class Terminal:
+    """Terminal display utilities"""
+    
+    WIDTH = 80
+    
+    @staticmethod
+    def clear():
+        """Clear terminal screen"""
+        os.system('cls' if os.name == 'nt' else 'clear')
+    
+    @staticmethod
+    def print_color(text: str, color=Fore.YELLOW, style=Style.NORMAL, end='\n'):
+        """Print colored text"""
+        if COLORS_AVAILABLE:
+            print(f"{style}{color}{text}{Style.RESET_ALL}", end=end)
+        else:
+            print(text, end=end)
+    
+    @staticmethod
+    def center(text: str, width: int = None) -> str:
+        """Center text"""
+        if width is None:
+            width = Terminal.WIDTH
+        return text.center(width)
+    
+    @staticmethod
+    def rule(char: str = "═", color=Fore.CYAN):
+        """Print a horizontal rule"""
+        Terminal.print_color(char * Terminal.WIDTH, color, Style.BRIGHT)
+    
+    @staticmethod
+    def header(title: str, subtitle: str = ""):
+        """Print formatted header"""
+        Terminal.rule("═")
+        Terminal.print_color(Terminal.center(title), Fore.YELLOW, Style.BRIGHT)
+        if subtitle:
+            Terminal.print_color(Terminal.center(subtitle), Fore.GREEN)
+        Terminal.rule("═")
+        print()
+    
+    @staticmethod
+    def footer():
+        """Print formatted footer"""
+        print()
+        Terminal.rule("═")
+        Terminal.print_color(Terminal.center("॥ ॐ शान्तिः शान्तिः शान्तिः ॥"), Fore.YELLOW, Style.BRIGHT)
+        Terminal.print_color(Terminal.center("गायत्री मन्त्र - सर्वमङ्गलमयी विद्या"), Fore.GREEN)
+        Terminal.print_color(Terminal.center("May the Divine Light Illuminate Your Path ✨"), Fore.LIGHTYELLOW_EX)
+        Terminal.rule("═")
+    
+    @staticmethod
+    def progress_bar(seconds: float = 2.0, message: str = "Loading"):
+        """Display an animated progress bar"""
+        print(f"{message} ", end='', flush=True)
+        for i in range(20):
+            print("█", end='', flush=True)
+            time.sleep(seconds / 20)
+        print(" ✓")
+
+# ==============================================================================
+# ANIMATION UTILITIES
+# ==============================================================================
+class Animations:
+    """Animation effects for terminal"""
+    
+    @staticmethod
+    def typing(text: str, delay: float = 0.05, color=Fore.LIGHTWHITE_EX):
+        """Typewriter effect"""
+        for char in text:
+            Terminal.print_color(char, color, end='', flush=True)
+            time.sleep(delay)
+        print()
+    
+    @staticmethod
+    def pulse(text: str, duration: float = 2.0):
+        """Pulsing text effect"""
+        if not COLORS_AVAILABLE:
+            print(text)
+            return
+        
+        start_time = time.time()
+        while time.time() - start_time < duration:
+            for i in range(10, 0, -1):
+                brightness = i / 10
+                print(f"\r{Fore.YELLOW}{text}{Style.RESET_ALL}", end='')
+                time.sleep(0.05)
+            for i in range(1, 11):
+                brightness = i / 10
+                print(f"\r{Fore.YELLOW}{text}{Style.RESET_ALL}", end='')
+                time.sleep(0.05)
+        print()
+    
+    @staticmethod
+    def shimmer(text: str, duration: float = 2.0):
+        """Shimmering text effect"""
+        if not COLORS_AVAILABLE:
+            print(text)
+            return
+        
+        colors = [Fore.YELLOW, Fore.LIGHTYELLOW_EX, Fore.WHITE, Fore.LIGHTYELLOW_EX]
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            for color in colors:
+                print(f"\r{color}{text}{Style.RESET_ALL}", end='')
+                time.sleep(0.1)
+        print()
+
+# ==============================================================================
+# MANTRA DISPLAY CLASS
+# ==============================================================================
+class MantraDisplay:
+    """Main display class for Gayatri Mantra"""
+    
+    def __init__(self):
+        self.mantra = GayatriMantra
+    
+    def show_title(self):
+        """Display animated title"""
+        Terminal.clear()
+        Terminal.header("🕉️  गायत्री मन्त्र  🕉️", "॥ सर्वमङ्गलमयी विद्या ॥")
+    
+    def show_mantra(self):
+        """Display the main mantra"""
+        print()
+        Terminal.print_color(Terminal.center("GAYATRI MANTRA"), Fore.YELLOW, Style.BRIGHT)
+        Terminal.rule("─", Fore.CYAN)
+        
+        for i, (sans, trans) in enumerate(zip(self.mantra.SANSKRIT, self.mantra.TRANSLITERATION)):
+            print()
+            Terminal.print_color(f"    {sans}", Fore.YELLOW, Style.BRIGHT)
+            time.sleep(0.3)
+            Terminal.print_color(f"    {trans}", Fore.LIGHTCYAN_EX)
+            time.sleep(0.2)
+        
+        print()
+        Terminal.rule("─", Fore.CYAN)
+    
+    def show_word_meanings(self):
+        """Display word-by-word meanings in columns"""
+        print()
+        Terminal.print_color(Terminal.center("📖  शब्दार्थः (WORD MEANINGS)  📖"), Fore.YELLOW, Style.BRIGHT)
+        Terminal.rule("─", Fore.CYAN)
+        
+        # Display in two columns
+        for i in range(0, len(self.mantra.WORD_MEANINGS), 2):
+            if i + 1 < len(self.mantra.WORD_MEANINGS):
+                w1, m1 = self.mantra.WORD_MEANINGS[i]
+                w2, m2 = self.mantra.WORD_MEANINGS[i + 1]
+                print(f"  {Fore.LIGHTYELLOW_EX}{w1:<15}{Style.RESET_ALL} - {m1:<35}  "
+                      f"{Fore.LIGHTYELLOW_EX}{w2:<15}{Style.RESET_ALL} - {m2}")
+            else:
+                w, m = self.mantra.WORD_MEANINGS[i]
+                print(f"  {Fore.LIGHTYELLOW_EX}{w:<15}{Style.RESET_ALL} - {m}")
+            time.sleep(0.1)
+        
+        Terminal.rule("─", Fore.CYAN)
+    
+    def show_meaning(self):
+        """Display complete meaning with animation"""
+        print()
+        Terminal.print_color(Terminal.center("📜  भावार्थः (COMPLETE MEANING)  📜"), Fore.YELLOW, Style.BRIGHT)
+        Terminal.rule("─", Fore.CYAN)
+        
+        for line in self.mantra.COMPLETE_MEANING.strip().split('\n'):
+            print(f"  {Fore.LIGHTGREEN_EX}{line.strip()}{Style.RESET_ALL}")
+            time.sleep(0.5)
+        
+        Terminal.rule("─", Fore.CYAN)
+    
+    def show_info_grid(self):
+        """Display information grid"""
+        print()
+        Terminal.print_color(Terminal.center("📊  मन्त्रविवरणम् (MANTRA DETAILS)  📊"), Fore.YELLOW, Style.BRIGHT)
+        Terminal.rule("─", Fore.CYAN)
+        
+        items = list(self.mantra.INFO.values())
+        for i in range(0, len(items), 2):
+            if i + 1 < len(items):
+                label1, val1 = items[i]
+                label2, val2 = items[i + 1]
+                print(f"  {Fore.LIGHTCYAN_EX}{label1:<12}{Style.RESET_ALL}: {val1:<30}  "
+                      f"{Fore.LIGHTCYAN_EX}{label2:<12}{Style.RESET_ALL}: {val2}")
+            else:
+                label, val = items[i]
+                print(f"  {Fore.LIGHTCYAN_EX}{label:<12}{Style.RESET_ALL}: {val}")
+        
+        Terminal.rule("─", Fore.CYAN)
+    
+    def show_benefits(self):
+        """Display benefits of chanting"""
+        print()
+        Terminal.print_color(Terminal.center("✨  लाभाः (BENEFITS)  ✨"), Fore.YELLOW, Style.BRIGHT)
+        Terminal.rule("─", Fore.CYAN)
+        
+        for emoji, benefit in self.mantra.BENEFITS:
+            print(f"    {emoji}  {Fore.LIGHTGREEN_EX}{benefit}{Style.RESET_ALL}")
+            time.sleep(0.2)
+        
+        Terminal.rule("─", Fore.CYAN)
+    
+    def show_times(self):
+        """Display best times to chant"""
+        print()
+        Terminal.print_color(Terminal.center("⏰  जपकालः (BEST TIME TO CHANT)  ⏰"), Fore.YELLOW, Style.BRIGHT)
+        Terminal.rule("─", Fore.CYAN)
+        
+        for emoji, time_slot in self.mantra.TIMES:
+            print(f"        {emoji}  {Fore.LIGHTCYAN_EX}{time_slot}{Style.RESET_ALL}")
+        
+        Terminal.rule("─", Fore.CYAN)
+    
+    def show_method(self):
+        """Display method of chanting"""
+        print()
+        Terminal.print_color(Terminal.center("📿  विधिः (METHOD OF CHANTING)  📿"), Fore.YELLOW, Style.BRIGHT)
+        Terminal.rule("─", Fore.CYAN)
+        
+        methods = [
+            "1. Sit in a comfortable posture (Padmasana or Sukhasana)",
+            "2. Face East or North direction",
+            "3. Take three deep breaths to center yourself",
+            "4. Chant with clear pronunciation and devotion",
+            "5. Traditional count: 108 times (one mala)",
+            "6. Use a rudraksha or tulsi mala for counting",
+            "7. Maintain awareness of the meaning while chanting",
+            "8. Conclude with a prayer for peace and wisdom"
+        ]
+        
+        for method in methods:
+            print(f"   {Fore.LIGHTWHITE_EX}{method}{Style.RESET_ALL}")
+            time.sleep(0.2)
+        
+        Terminal.rule("─", Fore.CYAN)
+    
+    def show_quote(self):
+        """Display sacred quote"""
+        print()
+        Terminal.print_color(Terminal.center("💫  श्रीमद्भगवद्गीता  💫"), Fore.YELLOW, Style.BRIGHT)
+        Terminal.rule("─", Fore.CYAN)
+        print(f'   {Fore.LIGHTYELLOW_EX}"गायत्री छन्दसामहम्" - भगवद्गीता (10.35){Style.RESET_ALL}')
+        print(f'   {Fore.LIGHTGREEN_EX}"Among the poetic meters, I am Gayatri" - Lord Krishna{Style.RESET_ALL}')
+        Terminal.rule("─", Fore.CYAN)
+    
+    def show_all(self):
+        """Display all sections"""
+        self.show_title()
+        self.show_mantra()
+        self.show_word_meanings()
+        self.show_meaning()
+        self.show_info_grid()
+        self.show_benefits()
+        self.show_times()
+        self.show_method()
+        self.show_quote()
+        Terminal.footer()
+
+# ==============================================================================
+# AUDIO SIMULATION
+# ==============================================================================
+class AudioSimulator:
+    """Simulate mantra chanting"""
+    
+    @staticmethod
+    def play_mantra(duration: int = 30):
+        """Simulate playing mantra chant"""
+        Terminal.print_color("\n🎵  Playing Gayatri Mantra Chant  🎵", Fore.YELLOW, Style.BRIGHT)
+        Terminal.rule("─", Fore.CYAN)
+        
+        syllables = ["ॐ", "भूः", "भुवः", "स्वः", "तत्", "सवितुः", "वरेण्यं", 
+                     "भर्गः", "देवस्य", "धीमहि", "धियः", "यः", "नः", "प्रचोदयात्"]
+        
+        start_time = time.time()
+        while time.time() - start_time < duration:
+            for syllable in syllables:
+                elapsed = time.time() - start_time
+                if elapsed >= duration:
+                    break
+                
+                # Random colors for visual effect
+                colors = [Fore.YELLOW, Fore.LIGHTYELLOW_EX, Fore.CYAN, Fore.LIGHTCYAN_EX]
+                color = random.choice(colors)
+                
+                print(f"\r{color}{syllable}{Style.RESET_ALL}  ", end='', flush=True)
+                
+                # Animated progress bar
+                progress = min(1.0, elapsed / duration)
+                bars = int(progress * 30)
+                print(f"[{'█'*bars}{'░'*(30-bars)}] ", end='', flush=True)
+                
+                time.sleep(0.5)
+        
+        print("\n\n✓ Chant completed!")
+        Terminal.rule("─", Fore.CYAN)
+
+# ==============================================================================
+# EXPORT FUNCTIONALITY
+# ==============================================================================
+def export_to_file(filename: str = "gayatri_mantra.txt") -> bool:
+    """Export mantra to text file"""
+    try:
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write("="*60 + "\n")
+            f.write("गायत्री मन्त्र".center(60) + "\n")
+            f.write("Gayatri Mantra".center(60) + "\n")
+            f.write("="*60 + "\n\n")
+            
+            f.write("SANSKRIT:\n")
+            for verse in GayatriMantra.SANSKRIT:
+                f.write(verse + "\n")
+            
+            f.write("\nTRANSLITERATION:\n")
+            for verse in GayatriMantra.TRANSLITERATION:
+                f.write(verse + "\n")
+            
+            f.write("\nWORD MEANINGS:\n")
+            for word, meaning in GayatriMantra.WORD_MEANINGS:
+                f.write(f"{word} - {meaning}\n")
+            
+            f.write("\nCOMPLETE MEANING:\n")
+            f.write(GayatriMantra.COMPLETE_MEANING + "\n")
+            
+            f.write("\n" + "="*60 + "\n")
+        
+        Terminal.print_color(f"\n✓ Mantra exported to {filename}", Fore.GREEN, Style.BRIGHT)
+        return True
+    except Exception as e:
+        Terminal.print_color(f"\n✗ Error exporting: {e}", Fore.RED)
+        return False
+
+# ==============================================================================
+# INTERACTIVE MENU
+# ==============================================================================
+class InteractiveMenu:
+    """Interactive menu system"""
+    
+    def __init__(self):
+        self.display = MantraDisplay()
+        self.audio = AudioSimulator()
+    
+    def show_main_menu(self):
+        """Display main menu"""
+        Terminal.clear()
+        Terminal.header("🕉️  गायत्री मन्त्र  🕉️", "Interactive Terminal Application")
+        
+        menu_items = [
+            ("1", "📖 View Complete Mantra"),
+            ("2", "🔍 View by Sections"),
+            ("3", "🎵 Play Chant (Simulated)"),
+            ("4", "💾 Export to File"),
+            ("5", "ℹ️  About"),
+            ("6", "❌ Exit")
+        ]
+        
+        for key, desc in menu_items:
+            print(f"  {Fore.LIGHTCYAN_EX}{key}{Style.RESET_ALL}. {desc}")
+        
+        print()
+        return input(f"  {Fore.LIGHTYELLOW_EX}Enter your choice (1-6): {Style.RESET_ALL}").strip()
+    
+    def show_sections_menu(self):
+        """Display sections menu"""
+        Terminal.clear()
+        Terminal.header("📑  SELECT A SECTION", "")
+        
+        sections = [
+            ("1", "📿 Main Mantra"),
+            ("2", "📖 Word Meanings"),
+            ("3", "📜 Complete Meaning"),
+            ("4", "📊 Mantra Details"),
+            ("5", "✨ Benefits"),
+            ("6", "⏰ Best Time to Chant"),
+            ("7", "📿 Method of Chanting"),
+            ("8", "💫 Sacred Quote"),
+            ("9", "◀ Back to Main Menu")
+        ]
+        
+        for key, desc in sections:
+            print(f"  {Fore.LIGHTCYAN_EX}{key}{Style.RESET_ALL}. {desc}")
+        
+        print()
+        return input(f"  {Fore.LIGHTYELLOW_EX}Enter your choice (1-9): {Style.RESET_ALL}").strip()
+    
+    def run_section(self, choice: str):
+        """Run selected section"""
+        Terminal.clear()
+        
+        if choice == '1':
+            self.display.show_title()
+            self.display.show_mantra()
+        elif choice == '2':
+            self.display.show_title()
+            self.display.show_word_meanings()
+        elif choice == '3':
+            self.display.show_title()
+            self.display.show_meaning()
+        elif choice == '4':
+            self.display.show_title()
+            self.display.show_info_grid()
+        elif choice == '5':
+            self.display.show_title()
+            self.display.show_benefits()
+        elif choice == '6':
+            self.display.show_title()
+            self.display.show_times()
+        elif choice == '7':
+            self.display.show_title()
+            self.display.show_method()
+        elif choice == '8':
+            self.display.show_title()
+            self.display.show_quote()
+        else:
+            return False
+        
+        Terminal.footer()
+        input(f"\n  {Fore.LIGHTYELLOW_EX}Press Enter to continue...{Style.RESET_ALL}")
+        return True
+    
+    def run(self):
+        """Main menu loop"""
+        # Check Unicode support
+        if not supports_unicode():
+            Terminal.print_color("\n⚠ Warning: Your terminal may not display Devanagari correctly.", Fore.YELLOW)
+            Terminal.print_color("For best experience, use a Unicode-compatible terminal.\n", Fore.YELLOW)
+            time.sleep(2)
+        
+        while True:
+            choice = self.show_main_menu()
+            
+            if choice == '1':
+                Terminal.clear()
+                self.display.show_all()
+                input(f"\n  {Fore.LIGHTYELLOW_EX}Press Enter to continue...{Style.RESET_ALL}")
+            
+            elif choice == '2':
+                while True:
+                    section_choice = self.show_sections_menu()
+                    if section_choice == '9':
+                        break
+                    if not self.run_section(section_choice):
+                        break
+            
+            elif choice == '3':
+                Terminal.clear()
+                self.display.show_title()
+                self.audio.play_mantra(20)  # 20 seconds simulation
+                input(f"\n  {Fore.LIGHTYELLOW_EX}Press Enter to continue...{Style.RESET_ALL}")
+            
+            elif choice == '4':
+                Terminal.clear()
+                self.display.show_title()
+                filename = input("Enter filename (default: gayatri_mantra.txt): ").strip()
+                if not filename:
+                    filename = "gayatri_mantra.txt"
+                export_to_file(filename)
+                input(f"\n  {Fore.LIGHTYELLOW_EX}Press Enter to continue...{Style.RESET_ALL}")
+            
+            elif choice == '5':
+                Terminal.clear()
+                Terminal.header("ℹ️  ABOUT", "")
+                print(f"""
+  {Fore.LIGHTCYAN_EX}Gayatri Mantra Terminal Application{Style.RESET_ALL}
+  
+  Version      : 1.0.0
+  Author       : Traditional (Composed by Sage Vishwamitra)
+  Language     : Sanskrit (संस्कृत)
+  Platform     : Python 3.6+
+  Features     : • Full Devanagari display
+                 • Interactive menu system
+                 • Word-by-word meanings
+                 • Audio simulation
+                 • Export functionality
+                 • Color-coded output
+  
+  {Fore.LIGHTGREEN_EX}The Gayatri Mantra is considered the essence of all four Vedas
+  and the most sacred mantra in Sanatan Dharma.{Style.RESET_ALL}
+                """)
+                Terminal.footer()
+                input(f"\n  {Fore.LIGHTYELLOW_EX}Press Enter to continue...{Style.RESET_ALL}")
+            
+            elif choice == '6':
+                Terminal.clear()
+                Animations.pulse("🕉️  ॐ शान्तिः शान्तिः शान्तिः  🕉️", 3)
+                Terminal.print_color("\nThank you for experiencing the Gayatri Mantra!", Fore.GREEN)
+                Terminal.print_color("May the Divine Light Illuminate Your Path ✨\n", Fore.LIGHTYELLOW_EX)
+                break
+            
+            else:
+                Terminal.print_color("\n  ⚠ Invalid choice! Please try again.", Fore.RED)
+                time.sleep(1)
+
+# ==============================================================================
+# MAIN FUNCTION
+# ==============================================================================
+def main():
+    """Main entry point"""
+    try:
+        # Welcome animation
+        Terminal.clear()
+        Animations.shimmer("🕉️  ॐ नमः शिवाय  🕉️", 2)
+        Terminal.progress_bar(1.5, "Loading Gayatri Mantra")
+        
+        # Start interactive menu
+        menu = InteractiveMenu()
+        menu.run()
+        
+    except KeyboardInterrupt:
+        Terminal.print_color("\n\n🙏 Program terminated by user. ॐ शान्तिः 🙏", Fore.YELLOW, Style.BRIGHT)
+        sys.exit(0)
+    except Exception as e:
+        Terminal.print_color(f"\n❌ Error: {e}", Fore.RED)
+        sys.exit(1)
+
+# ==============================================================================
+# ENTRY POINT
+# ==============================================================================
+if __name__ == "__main__":
+    main()
