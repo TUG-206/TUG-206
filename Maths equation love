@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Equation with Image</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #ff6b6b;
+            text-shadow: 0 0 15px rgba(255, 107, 107, 0.7);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ffd166;
+            margin-bottom: 20px;
+        }
+        
+        .equation {
+            font-size: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-family: 'Cambria Math', serif;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 450px;
+            border-radius: 8px;
+            background: #0a0a1a;
+        }
+        
+        .image-inside {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid rgba(255, 107, 107, 0.7);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-inside img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .controls {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            color: #ffd166;
+            font-weight: 600;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            background: #ff5252;
+            transform: scale(1.1);
+        }
+        
+        .value-display {
+            min-width: 50px;
+            text-align: center;
+            font-weight: 600;
+            color: #ff6b6b;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: none;
+            font-size: 0.9rem;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: #ff6b6b;
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #ffd166;
+            border: 2px solid #ffd166;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 209, 102, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .image-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .image-btn {
+            padding: 8px 15px;
+            background: rgba(107, 107, 255, 0.2);
+            border: 1px solid #6b6bff;
+            color: #6b6bff;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .image-btn:hover {
+            background: rgba(107, 107, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .info {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            line-height: 1.5;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+        
+        .info h3 {
+            color: #ffd166;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        
+        .info p {
+            color: #a5b1c2;
+            margin-bottom: 12px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .equation {
+                font-size: 1.2rem;
+                padding: 12px 18px;
+            }
+            
+            .controls {
+                padding: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .image-inside {
+                width: 150px;
+                height: 150px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.8rem;
+            }
+            
+            .equation {
+                font-size: 1rem;
+                padding: 10px 15px;
+            }
+            
+            canvas {
+                height: 350px;
+            }
+            
+            .image-inside {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Heart Equation with Image</h1>
+            <p class="subtitle">Mathematical Beauty with Your Photo</p>
+            
+            <div class="equation">
+                \[y = x^{\frac{2}{3}} + 0.9 \sin(kx) \sqrt{3 - x^2}\]
+            </div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="heartCanvas"></canvas>
+            <div class="image-inside">
+                <img id="heartImage" src="https://images.unsplash.com/photo-1511988617509-a57c8a288659?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Heart Image">
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">Parameter k: <span id="kValue">8</span></label>
+                <div class="slider-container">
+                    <input type="range" min="1" max="30" value="8" step="0.5" class="slider" id="kSlider">
+                    <div class="value-display" id="kDisplay">8.0</div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">Heart Scale: <span id="sizeValue">120</span>%</label>
+                <div class="slider-container">
+                    <input type="range" min="50" max="200" value="120" class="slider" id="sizeSlider">
+                    <div class="value-display" id="sizeDisplay">120%</div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">Animation Speed: <span id="speedValue">3.5</span>x</label>
+                <div class="slider-container">
+                    <input type="range" min="1" max="15" value="3.5" step="0.5" class="slider" id="speedSlider">
+                    <div class="value-display" id="speedDisplay">3.5x</div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">Line Color</label>
+                <div class="slider-container">
+                    <input type="color" id="colorPicker" value="#ff3366">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label class="control-label">Image Controls</label>
+                <div class="image-controls">
+                    <button class="image-btn" id="uploadBtn">Upload Image</button>
+                    <button class="image-btn" id="rotateBtn">Rotate Image</button>
+                    <button class="image-btn" id="pulseBtn">Pulse Effect</button>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn btn-primary" id="animateBtn">
+                    <i class="fas fa-play"></i>
+                    Toggle Animation
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">
+                    <i class="fas fa-redo"></i>
+                    Reset
+                </button>
+            </div>
+        </div>
+        
+        <div class="info">
+            <h3>About This Heart Equation</h3>
+            <p>This mathematical equation creates a single heart-shaped curve. It's defined for |x| ≤ √3 and produces only the upper half of a heart shape.</p>
+            <p>The parameter <strong>k</strong> controls the oscillations in the curve. Higher values create more ripples in the single heart line.</p>
+            <p>Upload your own image to place it inside the heart!</p>
+        </div>
+    </div>
+
+    <script>
+        // Get canvas and context
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        const heartImage = document.getElementById('heartImage');
+        const imageContainer = document.querySelector('.image-inside');
+        
+        // Set canvas dimensions
+        function setCanvasSize() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = 450;
+        }
+        
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+        
+        // Parameters - Increased default values
+        let k = 8; // Increased from 5
+        let scale = 1.2; // Increased from 1.0
+        let animationSpeed = 3.5; // Increased from 2.0
+        let isAnimating = true; // Start animating by default
+        let animationTime = 0;
+        let lineColor = '#ff3366';
+        let imageRotation = 0;
+        let pulseEffect = false;
+        let pulseScale = 1;
+        let pulseDirection = 0.01;
+        
+        // Get DOM elements
+        const kSlider = document.getElementById('kSlider');
+        const kDisplay = document.getElementById('kDisplay');
+        const kValue = document.getElementById('kValue');
+        
+        const sizeSlider = document.getElementById('sizeSlider');
+        const sizeDisplay = document.getElementById('sizeDisplay');
+        const sizeValue = document.getElementById('sizeValue');
+        
+        const speedSlider = document.getElementById('speedSlider');
+        const speedDisplay = document.getElementById('speedDisplay');
+        const speedValue = document.getElementById('speedValue');
+        
+        const colorPicker = document.getElementById('colorPicker');
+        const animateBtn = document.getElementById('animateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const rotateBtn = document.getElementById('rotateBtn');
+        const pulseBtn = document.getElementById('pulseBtn');
+        const imageUpload = document.getElementById('imageUpload');
+        
+        // Update parameter displays
+        function updateDisplays() {
+            kDisplay.textContent = k.toFixed(1);
+            kValue.textContent = k.toFixed(1);
+            
+            sizeDisplay.textContent = `${Math.round(scale * 100)}%`;
+            sizeValue.textContent = Math.round(scale * 100);
+            
+            speedDisplay.textContent = `${animationSpeed.toFixed(1)}x`;
+            speedValue.textContent = animationSpeed.toFixed(1);
+        }
+        
+        // Heart equation function
+        function heartEquation(x, k) {
+            return Math.pow(Math.abs(x), 2/3) + 0.9 * Math.sin(k * x) * Math.sqrt(Math.max(0, 3 - x * x));
+        }
+        
+        // Draw only the upper half of the heart (one side)
+        function drawHeart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2 + 30;
+            const graphScale = Math.min(canvas.width, canvas.height) / 6 * scale;
+            
+            // Draw the single heart curve (upper half only)
+            ctx.beginPath();
+            
+            let firstPoint = true;
+            for (let x = -Math.sqrt(3); x <= Math.sqrt(3); x += 0.01) {
+                // Increased animation effect with higher multiplier
+                const animatedX = isAnimating ? x + Math.sin(animationTime * 3 + x * 3) * 0.2 : x;
+                
+                const y = heartEquation(animatedX, k);
+                
+                const plotX = centerX + x * graphScale;
+                const plotY = centerY - y * graphScale;
+                
+                if (firstPoint) {
+                    ctx.moveTo(plotX, plotY);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(plotX, plotY);
+                }
+            }
+            
+            // Style the line
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 4; // Thicker line
+            ctx.shadowColor = lineColor;
+            ctx.shadowBlur = 15; // Increased glow
+            ctx.stroke();
+            
+            // Draw axes and grid
+            drawGrid(centerX, centerY);
+            
+            // Update animation time - significantly increased speed
+            if (isAnimating) {
+                animationTime += 0.12 * animationSpeed; // Significantly increased
+            }
+            
+            // Update pulse effect
+            if (pulseEffect) {
+                pulseScale += pulseDirection;
+                if (pulseScale >= 1.2 || pulseScale <= 0.9) {
+                    pulseDirection *= -1;
+                }
+                imageContainer.style.transform = `translate(-50%, -50%) scale(${pulseScale})`;
+            } else {
+                imageContainer.style.transform = `translate(-50%, -50%) rotate(${imageRotation}deg)`;
+            }
+        }
+        
+        // Draw grid and axes
+        function drawGrid(centerX, centerY) {
+            ctx.shadowBlur = 0;
+            
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.lineWidth = 1;
+            
+            // Vertical grid lines
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // Horizontal grid lines
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw axes
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 2;
+            
+            // X-axis
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+            
+            // Y-axis
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+            
+            // Add labels
+            ctx.fillStyle = '#ffd166';
+            ctx.font = '12px Arial';
+            ctx.fillText('x', canvas.width - 10, centerY - 5);
+            ctx.fillText('y', centerX + 10, 15);
+            
+            // Add equation text
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.font = '14px Arial';
+            ctx.fillText(`y = x^(2/3) + 0.9 sin(${k.toFixed(1)}x) √(3 - x²)`, 15, 25);
+            
+            // Add animation indicator
+            if (isAnimating) {
+                ctx.fillStyle = '#4CAF50';
+                ctx.font = 'bold 12px Arial';
+                ctx.fillText(`● Animating (Speed: ${animationSpeed.toFixed(1)}x)`, 15, 45);
+            }
+        }
+        
+        // Animation loop
+        function animate() {
+            if (isAnimating) {
+                drawHeart();
+                requestAnimationFrame(animate);
+            }
+        }
+        
+        // Event listeners
+        kSlider.addEventListener('input', function() {
+            k = parseFloat(this.value);
+            updateDisplays();
+            drawHeart();
+        });
+        
+        sizeSlider.addEventListener('input', function() {
+            scale = parseFloat(this.value) / 100;
+            updateDisplays();
+            drawHeart();
+        });
+        
+        speedSlider.addEventListener('input', function() {
+            animationSpeed = parseFloat(this.value);
+            updateDisplays();
+        });
+        
+        colorPicker.addEventListener('input', function() {
+            lineColor = this.value;
+            drawHeart();
+        });
+        
+        animateBtn.addEventListener('click', function() {
+            isAnimating = !isAnimating;
+            if (isAnimating) {
+                animate();
+                this.innerHTML = '<i class="fas fa-pause"></i> Pause Animation';
+                this.style.background = '#4CAF50';
+            } else {
+                this.innerHTML = '<i class="fas fa-play"></i> Start Animation';
+                this.style.background = '#ff6b6b';
+            }
+            drawHeart();
+        });
+        
+        resetBtn.addEventListener('click', function() {
+            k = 8;
+            scale = 1.2;
+            animationSpeed = 3.5;
+            animationTime = 0;
+            lineColor = '#ff3366';
+            imageRotation = 0;
+            pulseEffect = false;
+            pulseScale = 1;
+            pulseDirection = 0.01;
+            
+            kSlider.value = k;
+            sizeSlider.value = scale * 100;
+            speedSlider.value = animationSpeed;
+            colorPicker.value = lineColor;
+            
+            updateDisplays();
+            
+            if (!isAnimating) {
+                isAnimating = true;
+                animateBtn.innerHTML = '<i class="fas fa-pause"></i> Pause Animation';
+                animateBtn.style.background = '#4CAF50';
+                animate();
+            }
+            
+            heartImage.src = "https://images.unsplash.com/photo-1511988617509-a57c8a288659?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80";
+            imageContainer.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+            drawHeart();
+        });
+        
+        uploadBtn.addEventListener('click', function() {
+            imageUpload.click();
+        });
+        
+        imageUpload.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    heartImage.src = event.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+        
+        rotateBtn.addEventListener('click', function() {
+            imageRotation += 45;
+            imageContainer.style.transform = `translate(-50%, -50%) rotate(${imageRotation}deg)`;
+        });
+        
+        pulseBtn.addEventListener('click', function() {
+            pulseEffect = !pulseEffect;
+            if (pulseEffect) {
+                this.style.background = '#4CAF50';
+                this.style.color = 'white';
+            } else {
+                this.style.background = '';
+                this.style.color = '';
+                imageContainer.style.transform = `translate(-50%, -50%) rotate(${imageRotation}deg)`;
+            }
+        });
+        
+        // Initialize with animation running
+        updateDisplays();
+        animate();
+    </script>
+</body>
+</html>
