@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeGuard AI - Women's Safety with Real-Time Alerts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --secondary: #ff6b9d;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --danger: #e63946;
+            --safe: #2a9d8f;
+            --warning: #ff9f1c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header & Navigation */
+        header {
+            background: linear-gradient(135deg, var(--dark), var(--primary));
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            color: var(--secondary);
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+        
+        .mobile-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+        }
+        
+        /* Dashboard Layout */
+        .dashboard {
+            display: flex;
+            min-height: calc(100vh - 70px);
+            flex-wrap: wrap;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            min-width: 300px;
+        }
+        
+        /* Safety Status */
+        .safety-status {
+            background: linear-gradient(135deg, var(--primary), #6a11cb);
+            color: white;
+            border-radius: 15px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 20px rgba(138, 43, 226, 0.2);
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .status-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--safe);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        .status-danger {
+            background-color: var(--danger);
+            animation: danger-pulse 1s infinite;
+        }
+        
+        @keyframes danger-pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        .emergency-btn {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 1rem;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .emergency-btn:hover {
+            background-color: #c1121f;
+            transform: scale(1.02);
+        }
+        
+        .cta-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .cta-button:hover {
+            background: #7a1fd1;
+            transform: translateY(-2px);
+        }
+        
+        /* Map Container */
+        .map-container {
+            height: 350px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        #safety-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .location-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        /* Alert Panel */
+        .alert-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .alert-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .alert-item {
+            padding: 0.8rem;
+            border-left: 4px solid var(--safe);
+            background: #f8f9fa;
+            margin-bottom: 0.8rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .alert-item.danger {
+            border-left-color: var(--danger);
+            background: #ffeaea;
+        }
+        
+        .alert-item.warning {
+            border-left-color: var(--warning);
+            background: #fff4e6;
+        }
+        
+        /* Controls Panel */
+        .controls-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .control-group h3 {
+            margin-bottom: 0.8rem;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+        
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--safe);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* Contacts Panel */
+        .contacts-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .contact-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        /* AI Detection Panel */
+        .ai-detection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .detection-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .detection-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+        
+        .detection-status {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 0.8rem;
+        }
+        
+        .detection-active {
+            color: var(--safe);
+        }
+        
+        .detection-warning {
+            color: var(--warning);
+        }
+        
+        .detection-danger {
+            color: var(--danger);
+        }
+        
+        /* Audio Visualization */
+        .audio-viz {
+            height: 60px;
+            background: var(--dark);
+            border-radius: 10px;
+            margin-top: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .audio-bar {
+            width: 5px;
+            height: 15px;
+            background: var(--secondary);
+            margin: 0 2px;
+            border-radius: 3px;
+            animation: audio-wave 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes audio-wave {
+            0%, 100% { height: 15px; }
+            50% { height: 40px; }
+        }
+        
+        .audio-bar:nth-child(2) { animation-delay: 0.1s; }
+        .audio-bar:nth-child(3) { animation-delay: 0.2s; }
+        .audio-bar:nth-child(4) { animation-delay: 0.3s; }
+        .audio-bar:nth-child(5) { animation-delay: 0.4s; }
+        .audio-bar:nth-child(6) { animation-delay: 0.5s; }
+        .audio-bar:nth-child(7) { animation-delay: 0.6s; }
+        .audio-bar:nth-child(8) { animation-delay: 0.7s; }
+        
+        /* Emergency Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 450px;
+            padding: 1.5rem;
+            text-align: center;
+            animation: modal-appear 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        @keyframes modal-appear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-danger {
+            border-top: 10px solid var(--danger);
+        }
+        
+        .modal h2 {
+            color: var(--danger);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .countdown {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--danger);
+            margin: 1.2rem 0;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        
+        .cancel-btn {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .confirm-btn {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Location Access Prompt */
+        .location-prompt {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .location-prompt-content {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .location-prompt h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        /* Mobile-specific styles */
+        .mobile-only {
+            display: none;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1100px) {
+            .dashboard {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+            
+            .ai-detection {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                padding: 0 10px;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: var(--dark);
+                flex-direction: column;
+                padding: 1rem 0;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                z-index: 999;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-links li {
+                margin: 0;
+                text-align: center;
+                padding: 1rem 0;
+                width: 100%;
+            }
+            
+            .nav-links a {
+                justify-content: center;
+                padding: 0.5rem;
+            }
+            
+            .logo {
+                font-size: 1.3rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .sidebar {
+                padding: 1rem;
+            }
+            
+            .map-container {
+                height: 300px;
+            }
+            
+            .ai-detection {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .modal-content {
+                padding: 1.2rem;
+                margin: 10px;
+            }
+            
+            .modal-btn {
+                min-width: 100px;
+            }
+            
+            .mobile-only {
+                display: block;
+            }
+            
+            .desktop-only {
+                display: none;
+            }
+            
+            .safety-status, .alert-panel, .controls-panel, .contacts-panel {
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 8px;
+            }
+            
+            .main-content {
+                padding: 0.8rem;
+            }
+            
+            .detection-card {
+                padding: 1rem;
+            }
+            
+            .alert-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+            
+            .countdown {
+                font-size: 2rem;
+            }
+        }
+        
+        /* Touch-friendly elements */
+        button, 
+        input[type="checkbox"] + .slider,
+        .switch,
+        .nav-links a {
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        /* Improve scrolling on mobile */
+        .alert-list,
+        .contact-list {
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>SafeGuard AI</span>
+                </div>
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+                    <li><a href="#map"><i class="fas fa-map"></i> <span>Safety Map</span></a></li>
+                    <li><a href="#alerts"><i class="fas fa-bell"></i> <span>Alerts</span></a></li>
+                    <li><a href="#contacts"><i class="fas fa-users"></i> <span>Contacts</span></a></li>
+                    <li class="desktop-only"><a href="#settings"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                    <li class="mobile-only"><a href="#" id="mobileSettings"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Location Access Prompt -->
+    <div class="location-prompt" id="locationPrompt">
+        <div class="location-prompt-content">
+            <h2><i class="fas fa-map-marker-alt"></i> Location Access Required</h2>
+            <p>SafeGuard AI needs your location to provide accurate safety features and real-time alerts.</p>
+            <p>Please allow location access when prompted by your browser.</p>
+            <div style="margin: 2rem 0; font-size: 3rem; color: var(--primary);">
+                <i class="fas fa-location-crosshairs"></i>
+            </div>
+            <button class="cta-button" id="requestLocation">
+                <i class="fas fa-check-circle"></i> Allow Location Access
+            </button>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">Your location is only used for safety purposes and is never shared without your permission.</p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Safety Status -->
+            <div class="safety-status">
+                <div class="status-indicator">
+                    <div>
+                        <h3>Safety Status</h3>
+                        <p id="status-text">All systems active</p>
+                    </div>
+                    <div class="status-circle" id="status-indicator"></div>
+                </div>
+                <p><i class="fas fa-map-marker-alt"></i> Location: <span id="current-location">Getting your location...</span></p>
+                <p><i class="fas fa-clock"></i> Last updated: <span id="last-updated">Just now</span></p>
+                <p><i class="fas fa-satellite"></i> Accuracy: <span id="location-accuracy">--</span></p>
+                
+                <button class="emergency-btn" id="emergencyBtn">
+                    <i class="fas fa-exclamation-triangle"></i> EMERGENCY ALERT
+                </button>
+            </div>
+            
+            <!-- Contacts -->
+            <div class="contacts-panel">
+                <h3><i class="fas fa-users"></i> Trusted Contacts</h3>
+                <div class="contact-list" id="contact-list">
+                    <!-- Contacts will be loaded here -->
+                </div>
+                <button class="cta-button" style="width: 100%; margin-top: 1rem;" id="addContactBtn">
+                    <i class="fas fa-plus"></i> Add Contact
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- AI Detection Panel -->
+            <div class="ai-detection">
+                <div class="detection-card">
+                    <div class="detection-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <h3>Audio Detection</h3>
+                    <p>Monitoring for distress sounds</p>
+                    <div class="audio-viz">
+                        <div class="audio-bar"></div>
+                        <div class="audio-bar"></div>
+                        <div class="audio-bar"></div>
+                        <div class="audio-bar"></div>
+                        <div class="audio-bar"></div>
+                        <div class="audio-bar"></div>
+                        <div class="audio-bar"></div>
+                        <div class="audio-bar"></div>
+                    </div>
+                    <div class="detection-status detection-active" id="audio-status">
+                        ACTIVE - No threats detected
+                    </div>
+                </div>
+                
+                <div class="detection-card">
+                    <div class="detection-icon">
+                        <i class="fas fa-hand-paper"></i>
+                    </div>
+                    <h3>Gesture Detection</h3>
+                    <p>Monitoring emergency gestures</p>
+                    <div style="margin-top: 1rem; font-size: 2.5rem;">
+                        <i class="fas fa-hand-peace"></i>
+                    </div>
+                    <div class="detection-status detection-active" id="gesture-status">
+                        ACTIVE - Normal movement
+                    </div>
+                </div>
+                
+                <div class="detection-card">
+                    <div class="detection-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3>Location Tracking</h3>
+                    <p>Real-time GPS monitoring</p>
+                    <div style="margin-top: 1rem; font-size: 2.5rem;">
+                        <i class="fas fa-satellite" id="gps-icon"></i>
+                    </div>
+                    <div class="detection-status detection-active" id="location-status">
+                        ACTIVE - Tracking enabled
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Map -->
+            <div class="map-container">
+                <div id="safety-map"></div>
+                <button class="location-btn" id="centerMapBtn" title="Center on my location">
+                    <i class="fas fa-location-crosshairs"></i>
+                </button>
+            </div>
+            
+            <!-- Alert Panel -->
+            <div class="alert-panel">
+                <div class="alert-header">
+                    <h3><i class="fas fa-bell"></i> Recent Alerts</h3>
+                    <div>
+                        <button class="cta-button" id="testAlertBtn">
+                            <i class="fas fa-vial"></i> Test Alert
+                        </button>
+                        <button class="cta-button" id="shareLocationBtn" style="margin-left: 10px; background: var(--safe);">
+                            <i class="fas fa-share-alt"></i> Share Location
+                        </button>
+                    </div>
+                </div>
+                <div class="alert-list" id="alert-list">
+                    <!-- Alerts will be loaded here -->
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls-panel">
+                <h3><i class="fas fa-sliders-h"></i> Safety Controls</h3>
+                <div class="control-group">
+                    <div class="toggle-switch">
+                        <span><i class="fas fa-microphone"></i> Audio Detection</span>
+                        <label class="switch">
+                            <input type="checkbox" id="audioToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-switch">
+                        <span><i class="fas fa-hand-paper"></i> Gesture Detection</span>
+                        <label class="switch">
+                            <input type="checkbox" id="gestureToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-switch">
+                        <span><i class="fas fa-map-marker-alt"></i> Live Location Sharing</span>
+                        <label class="switch">
+                            <input type="checkbox" id="locationToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-switch">
+                        <span><i class="fas fa-volume-mute"></i> Stealth Mode</span>
+                        <label class="switch">
+                            <input type="checkbox" id="stealthToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Safe Routes</h3>
+                    <div class="safe-route-controls">
+                        <select id="destinationSelect" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 1rem; font-size: 0.95rem;">
+                            <option value="">Select destination...</option>
+                            <option value="home">Home</option>
+                            <option value="work">Workplace</option>
+                            <option value="college">College</option>
+                            <option value="mall">Shopping Mall</option>
+                            <option value="other">Other Location</option>
+                        </select>
+                        <button class="cta-button" style="width: 100%;" id="calculateRouteBtn">
+                            <i class="fas fa-route"></i> Calculate Safest Route
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="control-group mobile-only">
+                    <h3>Mobile Features</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="cta-button" style="background: var(--warning);" id="fakeCallBtn">
+                            <i class="fas fa-phone"></i> Fake Call
+                        </button>
+                        <button class="cta-button" style="background: #555;" id="flashlightBtn">
+                            <i class="fas fa-lightbulb"></i> Flashlight
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Emergency Modal -->
+    <div class="modal" id="emergencyModal">
+        <div class="modal-content modal-danger">
+            <h2><i class="fas fa-exclamation-triangle"></i> EMERGENCY ALERT</h2>
+            <p>You are about to send an emergency alert to your trusted contacts and local authorities.</p>
+            <p>Your location and audio recording will be shared.</p>
+            
+            <div class="countdown" id="countdown">5</div>
+            
+            <p>Alert will be sent in <span id="countdown-text">5 seconds</span>. Click CANCEL to stop.</p>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn cancel-btn" id="cancelEmergency">
+                    <i class="fas fa-times"></i> CANCEL
+                </button>
+                <button class="modal-btn confirm-btn" id="confirmEmergency">
+                    <i class="fas fa-paper-plane"></i> SEND NOW
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Contact Modal -->
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <h2><i class="fas fa-user-plus"></i> Add Trusted Contact</h2>
+            
+            <div style="text-align: left; margin: 1.5rem 0;">
+                <div style="margin-bottom: 1rem;">
+                    <label>Contact Name</label>
+                    <input type="text" id="contactName" placeholder="Enter name" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-top: 0.5rem; font-size: 1rem;">
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label>Phone Number</label>
+                    <input type="tel" id="contactPhone" placeholder="Enter phone number" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-top: 0.5rem; font-size: 1rem;">
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label>Relationship</label>
+                    <select id="contactRelationship" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-top: 0.5rem; font-size: 1rem;">
+                        <option value="family">Family</option>
+                        <option value="friend">Friend</option>
+                        <option value="colleague">Colleague</option>
+                        <option value="neighbor">Neighbor</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn cancel-btn" id="cancelContact">
+                    <i class="fas fa-times"></i> CANCEL
+                </button>
+                <button class="modal-btn confirm-btn" style="background: var(--safe);" id="saveContact">
+                    <i class="fas fa-save"></i> SAVE CONTACT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call Simulation Modal -->
+    <div class="modal" id="callModal">
+        <div class="modal-content" style="max-width: 350px;">
+            <h2><i class="fas fa-phone"></i> Simulating Call</h2>
+            <div style="margin: 2rem 0; text-align: center;">
+                <div id="callContactName" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;">Contact Name</div>
+                <div id="callPhoneNumber" style="font-size: 1.2rem; color: #666; margin-bottom: 2rem;">Phone Number</div>
+                <div style="font-size: 3rem; color: var(--safe); margin: 1.5rem 0;">
+                    <i class="fas fa-phone-volume"></i>
+                </div>
+                <div id="callTimer" style="font-size: 2rem; font-weight: bold; color: var(--primary); margin: 1rem 0;">00:00</div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel-btn" id="endCallBtn">
+                    <i class="fas fa-phone-slash"></i> End Call
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize variables
+        let map;
+        let userMarker;
+        let watchId = null;
+        let userLocation = null;
+        let emergencyContacts = [
+            { id: 1, name: "Priya Sharma", phone: "+919876543210", relationship: "Sister", avatar: "PS" },
+            { id: 2, name: "Rahul Verma", phone: "+919876543211", relationship: "Father", avatar: "RV" },
+            { id: 3, name: "Anjali Patel", phone: "+919876543212", relationship: "Friend", avatar: "AP" }
+        ];
+        
+        let alerts = [
+            { id: 1, type: "info", message: "Safety system activated", time: "2 minutes ago", location: "Initializing..." },
+            { id: 2, type: "info", message: "Location tracking enabled", time: "1 minute ago", location: "Waiting for GPS..." }
+        ];
+        
+        let emergencyCountdown;
+        let countdownValue = 5;
+        let isEmergencyActive = false;
+        let audioDetectionActive = true;
+        let gestureDetectionActive = true;
+        let locationAccessGranted = false;
+        
+        // Call simulation variables
+        let callTimerInterval;
+        let callSeconds = 0;
+        let currentCallContact = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLocationPermission();
+            setupEventListeners();
+            loadContacts();
+            loadAlerts();
+            simulateAIDetection();
+            
+            // Try to get location immediately
+            getUserLocation();
+        });
+        
+        // Get user location with better fallback
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        locationAccessGranted = true;
+                        document.getElementById('locationPrompt').style.display = 'none';
+                        
+                        // Initialize map with actual location
+                        if (!map) {
+                            initializeMap(position.coords.latitude, position.coords.longitude);
+                        } else {
+                            // Update existing map
+                            updateUserLocation(position);
+                        }
+                        
+                        startLocationTracking();
+                    },
+                    function(error) {
+                        console.log("Location error:", error.code, error.message);
+                        
+                        // Try with less accuracy
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                locationAccessGranted = true;
+                                document.getElementById('locationPrompt').style.display = 'none';
+                                
+                                if (!map) {
+                                    initializeMap(position.coords.latitude, position.coords.longitude);
+                                } else {
+                                    updateUserLocation(position);
+                                }
+                                
+                                startLocationTracking();
+                            },
+                            function(error2) {
+                                console.log("Second location attempt failed:", error2);
+                                
+                                // Try IP-based location as last resort
+                                getIPLocation();
+                            },
+                            { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+                        );
+                    },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                );
+            } else {
+                // Geolocation not supported
+                console.log("Geolocation not supported");
+                getIPLocation();
+            }
+        }
+        
+        // Get approximate location using IP
+        function getIPLocation() {
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("IP-based location:", data);
+                    document.getElementById('locationPrompt').style.display = 'none';
+                    
+                    const lat = parseFloat(data.latitude) || 28.6139;
+                    const lng = parseFloat(data.longitude) || 77.2090;
+                    const city = data.city || "Unknown";
+                    const country = data.country_name || "Unknown";
+                    
+                    if (!map) {
+                        initializeMap(lat, lng);
+                    }
+                    
+                    document.getElementById('current-location').textContent = `${city}, ${country}`;
+                    document.getElementById('location-accuracy').textContent = 'Low (IP-based)';
+                    
+                    // Add alert about location accuracy
+                    addAlert('warning', 'Using approximate location (IP-based)', 'Location Service');
+                })
+                .catch(error => {
+                    console.log("IP location error:", error);
+                    document.getElementById('locationPrompt').style.display = 'flex';
+                    
+                    // Use default location
+                    if (!map) {
+                        initializeMap(28.6139, 77.2090);
+                    }
+                    document.getElementById('current-location').textContent = "Delhi, India (Default)";
+                    document.getElementById('location-accuracy').textContent = 'Default location';
+                });
+        }
+        
+        // Check if location permission is granted
+        function checkLocationPermission() {
+            // Check if we already have permission
+            if (navigator.permissions && navigator.permissions.query) {
+                navigator.permissions.query({name: 'geolocation'})
+                    .then(function(result) {
+                        if (result.state === 'granted') {
+                            getUserLocation();
+                        } else if (result.state === 'prompt') {
+                            document.getElementById('locationPrompt').style.display = 'flex';
+                        } else {
+                            // Permission denied
+                            getIPLocation();
+                        }
+                    });
+            } else {
+                // Permissions API not supported, try to get location
+                getUserLocation();
+            }
+        }
+        
+        // Request location access
+        function requestLocationAccess() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        locationAccessGranted = true;
+                        document.getElementById('locationPrompt').style.display = 'none';
+                        
+                        if (!map) {
+                            initializeMap(position.coords.latitude, position.coords.longitude);
+                        }
+                        
+                        startLocationTracking();
+                        addAlert('info', 'Location access granted', 'System');
+                    },
+                    function(error) {
+                        console.error("Location error:", error);
+                        
+                        // Show more specific error message
+                        let errorMessage = "Unable to access your location. ";
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage += "Permission was denied. Please enable location in your browser settings.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage += "Location information is unavailable.";
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage += "The request to get location timed out.";
+                                break;
+                            default:
+                                errorMessage += "An unknown error occurred.";
+                        }
+                        
+                        alert(errorMessage);
+                        
+                        // Fallback to IP location
+                        getIPLocation();
+                        addAlert('warning', 'Location access denied. Using approximate location.', 'System');
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            }
+        }
+        
+        // Initialize Leaflet map
+        function initializeMap(lat, lng) {
+            map = L.map('safety-map').setView([lat, lng], 15);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add user marker
+            userMarker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    html: '<i class="fas fa-female" style="color: #ff6b9d; font-size: 24px; background: white; border-radius: 50%; padding: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></i>',
+                    className: 'user-marker',
+                    iconSize: [40, 40]
+                })
+            }).addTo(map)
+                .bindPopup('<b>You are here</b><br>SafeGuard AI is active')
+                .openPopup();
+            
+            // Add safe zones (based on user location)
+            addSafeZones(lat, lng);
+            
+            // Update location display
+            reverseGeocode(lat, lng);
+        }
+        
+        // Add safe zones around user location
+        function addSafeZones(lat, lng) {
+            const safeZones = [
+                { coords: [lat + 0.002, lng + 0.001], name: "Police Station", type: "police", distance: getRandomDistance() },
+                { coords: [lat - 0.0015, lng + 0.002], name: "Hospital", type: "hospital", distance: getRandomDistance() },
+                { coords: [lat + 0.001, lng - 0.002], name: "Women's Safety Hub", type: "safety", distance: getRandomDistance() },
+                { coords: [lat - 0.002, lng - 0.001], name: "24/7 Pharmacy", type: "pharmacy", distance: getRandomDistance() }
+            ];
+            
+            safeZones.forEach(zone => {
+                let icon;
+                let color;
+                if (zone.type === "police") {
+                    icon = 'fa-shield-alt';
+                    color = '#4361ee';
+                } else if (zone.type === "hospital") {
+                    icon = 'fa-hospital';
+                    color = '#e63946';
+                } else {
+                    icon = 'fa-star';
+                    color = '#2a9d8f';
+                }
+                
+                const markerIcon = L.divIcon({ 
+                    html: `<i class="fas ${icon}" style="color: ${color}; font-size: 22px; background: white; padding: 5px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></i>`, 
+                    className: 'safe-zone-icon',
+                    iconSize: [35, 35]
+                });
+                
+                L.marker(zone.coords, { icon: markerIcon }).addTo(map)
+                    .bindPopup(`<b>${zone.name}</b><br>Safe location available 24/7<br><small>Approx. ${zone.distance} meters away</small>`);
+            });
+            
+            // Add danger zone (simulated) - far from user
+            const dangerCircle = L.circle([lat + 0.005, lng + 0.005], {
+                color: '#e63946',
+                fillColor: '#e63946',
+                fillOpacity: 0.2,
+                radius: 150
+            }).addTo(map).bindPopup("<b>Reported incident area</b><br>Avoid if possible<br><small>Last reported: 2 hours ago</small>");
+        }
+        
+        function getRandomDistance() {
+            return Math.floor(Math.random() * 500) + 200;
+        }
+        
+        // Start continuous location tracking
+        function startLocationTracking() {
+            if (!navigator.geolocation || !locationAccessGranted) return;
+            
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            };
+            
+            watchId = navigator.geolocation.watchPosition(
+                function(position) {
+                    updateUserLocation(position);
+                },
+                function(error) {
+                    console.error("Location tracking error:", error);
+                    document.getElementById('location-status').textContent = 'ERROR - GPS unavailable';
+                    document.getElementById('location-status').className = 'detection-status detection-warning';
+                    document.getElementById('gps-icon').className = 'fas fa-map-marker-alt';
+                    document.getElementById('gps-icon').style.color = '#ff9f1c';
+                    
+                    addAlert('warning', 'GPS signal lost. Using last known location.', 'Location Tracking');
+                },
+                options
+            );
+        }
+        
+        // Update user location on map and display
+        function updateUserLocation(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+            
+            userLocation = { lat, lng, accuracy };
+            
+            // Update marker position
+            if (userMarker) {
+                userMarker.setLatLng([lat, lng]);
+            } else {
+                // Create marker if it doesn't exist
+                userMarker = L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        html: '<i class="fas fa-female" style="color: #ff6b9d; font-size: 24px; background: white; border-radius: 50%; padding: 5px;"></i>',
+                        className: 'user-marker',
+                        iconSize: [40, 40]
+                    })
+                }).addTo(map)
+                    .bindPopup('<b>You are here</b>')
+                    .openPopup();
+            }
+            
+            // Update map view if needed
+            if (map && map.getZoom() < 10) {
+                map.setView([lat, lng], 15);
+            }
+            
+            // Update location display
+            reverseGeocode(lat, lng);
+            
+            // Update accuracy display
+            if (accuracy < 20) {
+                document.getElementById('location-accuracy').textContent = 'Very High (±' + Math.round(accuracy) + 'm)';
+            } else if (accuracy < 50) {
+                document.getElementById('location-accuracy').textContent = 'High (±' + Math.round(accuracy) + 'm)';
+            } else if (accuracy < 100) {
+                document.getElementById('location-accuracy').textContent = 'Medium (±' + Math.round(accuracy) + 'm)';
+            } else {
+                document.getElementById('location-accuracy').textContent = 'Low (±' + Math.round(accuracy) + 'm)';
+            }
+            
+            // Update timestamp
+            const now = new Date();
+            document.getElementById('last-updated').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Update GPS icon status
+            const gpsIcon = document.getElementById('gps-icon');
+            if (accuracy < 50) {
+                gpsIcon.className = 'fas fa-satellite';
+                gpsIcon.style.color = '#2a9d8f';
+                document.getElementById('location-status').textContent = 'ACTIVE - High accuracy';
+            } else {
+                gpsIcon.className = 'fas fa-map-marker-alt';
+                gpsIcon.style.color = '#ff9f1c';
+                document.getElementById('location-status').textContent = 'ACTIVE - Medium accuracy';
+            }
+            
+            // Add periodic check-in alert occasionally
+            if (Math.random() < 0.05) { // 5% chance
+                const locationName = document.getElementById('current-location').textContent;
+                addAlert('info', 'Regular location check-in', locationName);
+            }
+        }
+        
+        // Reverse geocode coordinates to address
+        function reverseGeocode(lat, lng) {
+            // Using OpenStreetMap Nominatim API
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=16&addressdetails=1`;
+            
+            // Show coordinates while waiting
+            document.getElementById('current-location').textContent = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    let locationName = "Unknown location";
+                    if (data.address) {
+                        // Try to get a readable address
+                        const addr = data.address;
+                        if (addr.road && addr.city) {
+                            locationName = `${addr.road}, ${addr.city}`;
+                        } else if (addr.suburb && addr.city) {
+                            locationName = `${addr.suburb}, ${addr.city}`;
+                        } else if (addr.city) {
+                            locationName = addr.city;
+                        } else if (addr.town) {
+                            locationName = addr.town;
+                        } else if (addr.village) {
+                            locationName = addr.village;
+                        } else if (addr.county) {
+                            locationName = addr.county;
+                        } else if (addr.state) {
+                            locationName = addr.state;
+                        }
+                    }
+                    document.getElementById('current-location').textContent = locationName;
+                })
+                .catch(error => {
+                    console.log("Geocoding error:", error);
+                    // Keep coordinates if geocoding fails
+                });
+        }
+        
+        // Center map on user location
+        function centerMapOnUser() {
+            if (userLocation && map) {
+                map.setView([userLocation.lat, userLocation.lng], 16);
+                userMarker.openPopup();
+                addAlert('info', 'Map centered on your location', 'Map Control');
+            } else if (navigator.geolocation) {
+                // Try to get current position
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        if (map) {
+                            map.setView([position.coords.latitude, position.coords.longitude], 16);
+                        }
+                        if (userMarker) {
+                            userMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
+                            userMarker.openPopup();
+                        }
+                        addAlert('info', 'Map centered on your location', 'Map Control');
+                    },
+                    function(error) {
+                        alert("Unable to get your current location.");
+                    }
+                );
+            }
+        }
+        
+        // Load contacts into the UI
+        function loadContacts() {
+            const contactList = document.getElementById('contact-list');
+            contactList.innerHTML = '';
+            
+            emergencyContacts.forEach(contact => {
+                const contactItem = document.createElement('div');
+                contactItem.className = 'contact-item';
+                contactItem.innerHTML = `
+                    <div class="contact-avatar">${contact.avatar}</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600;">${contact.name}</div>
+                        <div style="font-size: 0.9rem; color: #666;">${contact.phone}</div>
+                        <div style="font-size: 0.8rem; color: #888;">${contact.relationship}</div>
+                    </div>
+                    <button class="call-btn" data-contact-id="${contact.id}" style="background: none; border: none; color: var(--safe); cursor: pointer; padding: 5px; font-size: 1.2rem;" title="Call ${contact.name}">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                `;
+                
+                contactList.appendChild(contactItem);
+            });
+            
+            // Add call button listeners
+            document.querySelectorAll('.call-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const contactId = parseInt(this.getAttribute('data-contact-id'));
+                    const contact = emergencyContacts.find(c => c.id === contactId);
+                    if (contact) {
+                        initiateCall(contact);
+                    }
+                });
+            });
+        }
+        
+        // Initiate a call to a contact
+        function initiateCall(contact) {
+            currentCallContact = contact;
+            callSeconds = 0;
+            
+            // Update call modal with contact info
+            document.getElementById('callContactName').textContent = contact.name;
+            document.getElementById('callPhoneNumber').textContent = contact.phone;
+            document.getElementById('callTimer').textContent = '00:00';
+            
+            // Show call modal
+            document.getElementById('callModal').style.display = 'flex';
+            
+            // Start call timer
+            callTimerInterval = setInterval(function() {
+                callSeconds++;
+                const minutes = Math.floor(callSeconds / 60);
+                const seconds = callSeconds % 60;
+                document.getElementById('callTimer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+            
+            // Add alert about the call
+            addAlert('info', `Calling ${contact.name}`, 'Communication');
+            
+            // Log the call attempt
+            console.log(`Initiating call to ${contact.name} at ${contact.phone}`);
+            
+            // On mobile devices, this could actually initiate a call
+            if (isMobileDevice()) {
+                // For demonstration, we'll show what would happen
+                console.log('On a real mobile app, this would open the dialer with number: ' + contact.phone);
+                
+                // Uncomment this line to actually try to make a call on mobile:
+                // window.location.href = 'tel:' + contact.phone.replace(/\D/g, '');
+            }
+        }
+        
+        // End current call
+        function endCall() {
+            if (callTimerInterval) {
+                clearInterval(callTimerInterval);
+            }
+            
+            document.getElementById('callModal').style.display = 'none';
+            
+            if (currentCallContact) {
+                const minutes = Math.floor(callSeconds / 60);
+                const seconds = callSeconds % 60;
+                const duration = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                addAlert('info', `Call ended with ${currentCallContact.name} (Duration: ${duration})`, 'Communication');
+                currentCallContact = null;
+            }
+        }
+        
+        // Load alerts into the UI
+        function loadAlerts() {
+            const alertList = document.getElementById('alert-list');
+            alertList.innerHTML = '';
+            
+            alerts.forEach(alert => {
+                const alertItem = document.createElement('div');
+                alertItem.className = `alert-item ${alert.type}`;
+                alertItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <div style="font-weight: 600;">${alert.message}</div>
+                        <div style="font-size: 0.8rem; color: #666;">${alert.time}</div>
+                    </div>
+                    <div style="font-size: 0.9rem;">
+                        <i class="fas fa-map-marker-alt"></i> ${alert.location}
+                    </div>
+                `;
+                
+                alertList.appendChild(alertItem);
+            });
+            
+            // Scroll to top of alert list
+            if (alertList.firstChild) {
+                alertList.scrollTop = 0;
+            }
+        }
+        
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Mobile menu toggle
+            document.getElementById('mobileToggle').addEventListener('click', function() {
+                document.getElementById('navLinks').classList.toggle('active');
+            });
+            
+            // Close mobile menu when clicking a link
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', function() {
+                    document.getElementById('navLinks').classList.remove('active');
+                });
+            });
+            
+            // Location access request
+            document.getElementById('requestLocation').addEventListener('click', requestLocationAccess);
+            
+            // Emergency button
+            document.getElementById('emergencyBtn').addEventListener('click', function() {
+                if (!isEmergencyActive) {
+                    startEmergencyCountdown();
+                }
+            });
+            
+            // Cancel emergency
+            document.getElementById('cancelEmergency').addEventListener('click', function() {
+                cancelEmergency();
+            });
+            
+            // Confirm emergency
+            document.getElementById('confirmEmergency').addEventListener('click', function() {
+                triggerEmergencyAlert();
+            });
+            
+            // Test alert button
+            document.getElementById('testAlertBtn').addEventListener('click', function() {
+                createTestAlert();
+            });
+            
+            // Share location button
+            document.getElementById('shareLocationBtn').addEventListener('click', function() {
+                shareCurrentLocation();
+            });
+            
+            // Center map button
+            document.getElementById('centerMapBtn').addEventListener('click', centerMapOnUser);
+            
+            // Toggle switches
+            document.getElementById('audioToggle').addEventListener('change', function() {
+                audioDetectionActive = this.checked;
+                updateDetectionStatus();
+            });
+            
+            document.getElementById('gestureToggle').addEventListener('change', function() {
+                gestureDetectionActive = this.checked;
+                updateDetectionStatus();
+            });
+            
+            // Add contact button
+            document.getElementById('addContactBtn').addEventListener('click', function() {
+                document.getElementById('contactModal').style.display = 'flex';
+            });
+            
+            // Contact modal buttons
+            document.getElementById('cancelContact').addEventListener('click', function() {
+                document.getElementById('contactModal').style.display = 'none';
+                clearContactForm();
+            });
+            
+            document.getElementById('saveContact').addEventListener('click', function() {
+                saveNewContact();
+            });
+            
+            // Calculate route button
+            document.getElementById('calculateRouteBtn').addEventListener('click', function() {
+                calculateSafeRoute();
+            });
+            
+            // Mobile-specific buttons
+            document.getElementById('fakeCallBtn')?.addEventListener('click', function() {
+                simulateFakeCall();
+            });
+            
+            document.getElementById('flashlightBtn')?.addEventListener('click', function() {
+                toggleFlashlight();
+            });
+            
+            // Mobile settings
+            document.getElementById('mobileSettings')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert("Settings panel would open here on mobile app.");
+                addAlert('info', 'Settings accessed', 'Mobile Interface');
+            });
+            
+            // End call button
+            document.getElementById('endCallBtn').addEventListener('click', endCall);
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                const emergencyModal = document.getElementById('emergencyModal');
+                const contactModal = document.getElementById('contactModal');
+                const callModal = document.getElementById('callModal');
+                
+                if (event.target === emergencyModal) {
+                    cancelEmergency();
+                }
+                
+                if (event.target === contactModal) {
+                    contactModal.style.display = 'none';
+                    clearContactForm();
+                }
+                
+                if (event.target === callModal) {
+                    // Don't close call modal by clicking outside
+                    // endCall(); // Uncomment if you want to allow closing by clicking outside
+                }
+            });
+            
+            // Handle orientation change on mobile
+            window.addEventListener('orientationchange', function() {
+                // Give map time to adjust
+                setTimeout(function() {
+                    if (map) {
+                        map.invalidateSize();
+                        if (userLocation) {
+                            map.setView([userLocation.lat, userLocation.lng], map.getZoom());
+                        }
+                    }
+                }, 300);
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (map) {
+                    map.invalidateSize();
+                }
+            });
+        }
+        
+        // Simulate fake call
+        function simulateFakeCall() {
+            // Create a fake incoming call screen
+            const fakeCallModal = document.createElement('div');
+            fakeCallModal.className = 'modal';
+            fakeCallModal.style.display = 'flex';
+            fakeCallModal.innerHTML = `
+                <div class="modal-content" style="max-width: 350px; background: linear-gradient(135deg, var(--primary), #6a11cb); color: white;">
+                    <div style="text-align: center; padding: 2rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">
+                            <i class="fas fa-phone-volume"></i>
+                        </div>
+                        <h2 style="color: white;">Incoming Call</h2>
+                        <div style="font-size: 1.5rem; font-weight: bold; margin: 1rem 0;">Mom</div>
+                        <div style="font-size: 1.2rem; opacity: 0.9;">+91 98765 43210</div>
+                        <div style="margin: 2rem 0; font-size: 2rem;" id="fakeCallTimer">00:05</div>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <button id="declineFakeCall" style="background: var(--danger); color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 1.5rem;">
+                                <i class="fas fa-phone-slash"></i>
+                            </button>
+                            <button id="answerFakeCall" style="background: var(--safe); color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 1.5rem;">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(fakeCallModal);
+            
+            // Add timer countdown
+            let fakeCallSeconds = 5;
+            const fakeCallTimer = setInterval(function() {
+                fakeCallSeconds--;
+                document.getElementById('fakeCallTimer').textContent = `00:${fakeCallSeconds.toString().padStart(2, '0')}`;
+                
+                if (fakeCallSeconds <= 0) {
+                    clearInterval(fakeCallTimer);
+                    document.body.removeChild(fakeCallModal);
+                    addAlert('info', 'Fake call ended (auto-decline)', 'Safety Feature');
+                }
+            }, 1000);
+            
+            // Add event listeners for the buttons
+            setTimeout(function() {
+                document.getElementById('declineFakeCall').addEventListener('click', function() {
+                    clearInterval(fakeCallTimer);
+                    document.body.removeChild(fakeCallModal);
+                    addAlert('info', 'Fake call declined', 'Safety Feature');
+                });
+                
+                document.getElementById('answerFakeCall').addEventListener('click', function() {
+                    clearInterval(fakeCallTimer);
+                    document.body.removeChild(fakeCallModal);
+                    // Simulate answered call
+                    const answeredCallModal = document.createElement('div');
+                    answeredCallModal.className = 'modal';
+                    answeredCallModal.style.display = 'flex';
+                    answeredCallModal.innerHTML = `
+                        <div class="modal-content" style="max-width: 350px;">
+                            <div style="text-align: center; padding: 2rem;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--safe);">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <h2>On Call</h2>
+                                <div style="font-size: 1.5rem; font-weight: bold; margin: 1rem 0;">Mom</div>
+                                <div style="font-size: 2rem; font-weight: bold; margin: 2rem 0;" id="answeredCallTimer">00:00</div>
+                                <button id="endFakeCall" class="cta-button" style="background: var(--danger);">
+                                    <i class="fas fa-phone-slash"></i> End Call
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(answeredCallModal);
+                    
+                    // Timer for answered call
+                    let answeredSeconds = 0;
+                    const answeredTimer = setInterval(function() {
+                        answeredSeconds++;
+                        const minutes = Math.floor(answeredSeconds / 60);
+                        const seconds = answeredSeconds % 60;
+                        document.getElementById('answeredCallTimer').textContent = 
+                            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }, 1000);
+                    
+                    // End call button
+                    document.getElementById('endFakeCall').addEventListener('click', function() {
+                        clearInterval(answeredTimer);
+                        document.body.removeChild(answeredCallModal);
+                        addAlert('info', 'Fake call ended', 'Safety Feature');
+                    });
+                    
+                    addAlert('info', 'Fake call answered', 'Safety Feature');
+                });
+            }, 100);
+        }
+        
+        // Toggle flashlight (simulation)
+        function toggleFlashlight() {
+            // In a real app, this would use the MediaDevices API to access camera flash
+            // For simulation, we'll just show a flashlight effect
+            const flashlightOverlay = document.createElement('div');
+            flashlightOverlay.style.position = 'fixed';
+            flashlightOverlay.style.top = '0';
+            flashlightOverlay.style.left = '0';
+            flashlightOverlay.style.width = '100%';
+            flashlightOverlay.style.height = '100%';
+            flashlightOverlay.style.backgroundColor = 'white';
+            flashlightOverlay.style.zIndex = '9999';
+            flashlightOverlay.style.opacity = '0.9';
+            flashlightOverlay.style.pointerEvents = 'none';
+            flashlightOverlay.style.transition = 'opacity 0.3s';
+            
+            document.body.appendChild(flashlightOverlay);
+            
+            // Toggle on/off
+            let isOn = true;
+            const toggleInterval = setInterval(function() {
+                isOn = !isOn;
+                flashlightOverlay.style.opacity = isOn ? '0.9' : '0';
+            }, 500);
+            
+            // Remove after 3 seconds
+            setTimeout(function() {
+                clearInterval(toggleInterval);
+                document.body.removeChild(flashlightOverlay);
+                addAlert('info', 'Flashlight toggled (simulation)', 'Safety Feature');
+            }, 3000);
+        }
+        
+        // Start emergency countdown
+        function startEmergencyCountdown() {
+            isEmergencyActive = true;
+            countdownValue = 5;
+            document.getElementById('emergencyModal').style.display = 'flex';
+            document.getElementById('countdown').textContent = countdownValue;
+            document.getElementById('countdown-text').textContent = `${countdownValue} seconds`;
+            
+            emergencyCountdown = setInterval(function() {
+                countdownValue--;
+                document.getElementById('countdown').textContent = countdownValue;
+                document.getElementById('countdown-text').textContent = `${countdownValue} second${countdownValue !== 1 ? 's' : ''}`;
+                
+                if (countdownValue <= 0) {
+                    clearInterval(emergencyCountdown);
+                    triggerEmergencyAlert();
+                }
+            }, 1000);
+        }
+        
+        // Cancel emergency
+        function cancelEmergency() {
+            clearInterval(emergencyCountdown);
+            document.getElementById('emergencyModal').style.display = 'none';
+            isEmergencyActive = false;
+            
+            // Add cancel alert
+            addAlert('info', 'Emergency alert cancelled', 'User cancelled the emergency alert');
+        }
+        
+        // Trigger emergency alert
+        function triggerEmergencyAlert() {
+            clearInterval(emergencyCountdown);
+            document.getElementById('emergencyModal').style.display = 'none';
+            isEmergencyActive = false;
+            
+            // Update status
+            document.getElementById('status-indicator').className = 'status-circle status-danger';
+            document.getElementById('status-text').textContent = 'EMERGENCY ALERT SENT';
+            document.getElementById('status-text').style.color = 'var(--danger)';
+            
+            // Get current location for alert
+            const locationText = document.getElementById('current-location').textContent;
+            
+            // Create emergency alert
+            const emergencyAlert = {
+                id: alerts.length + 1,
+                type: 'danger',
+                message: 'EMERGENCY ALERT: Distress signal sent to contacts',
+                time: 'Just now',
+                location: locationText
+            };
+            
+            alerts.unshift(emergencyAlert);
+            loadAlerts();
+            
+            // Simulate sending to contacts
+            simulateEmergencyNotifications(locationText);
+            
+            // Show confirmation
+            alert(`EMERGENCY ALERT SENT!\n\nYour location (${locationText}) and distress signal have been sent to:\n- All trusted contacts\n- Local police authorities\n- Nearby SafeGuard users`);
+            
+            // Reset status after 30 seconds
+            setTimeout(function() {
+                if (!isEmergencyActive) {
+                    document.getElementById('status-indicator').className = 'status-circle';
+                    document.getElementById('status-text').textContent = 'All systems active';
+                    document.getElementById('status-text').style.color = 'white';
+                }
+            }, 30000);
+        }
+        
+        // Simulate AI detection
+        function simulateAIDetection() {
+            // Randomly simulate threat detection (for demo purposes)
+            setInterval(function() {
+                if (!audioDetectionActive && !gestureDetectionActive) return;
+                
+                const random = Math.random();
+                
+                // 5% chance of simulating a threat
+                if (random < 0.05) {
+                    simulateThreat();
+                }
+                // 10% chance of simulating unusual activity
+                else if (random < 0.15) {
+                    simulateUnusualActivity();
+                }
+            }, 10000); // Check every 10 seconds
+        }
+        
+        // Simulate a threat detection
+        function simulateThreat() {
+            if (!isEmergencyActive) {
+                // Update detection status
+                document.getElementById('audio-status').textContent = 'THREAT DETECTED - Aggressive audio pattern';
+                document.getElementById('audio-status').className = 'detection-status detection-danger';
+                
+                // Add alert
+                addAlert('warning', 'Potential threat detected: Aggressive vocal patterns', 'AI audio analysis');
+                
+                // Auto-trigger emergency after 2 seconds if no cancel
+                setTimeout(function() {
+                    if (!isEmergencyActive) {
+                        startEmergencyCountdown();
+                    }
+                }, 2000);
+            }
+        }
+        
+        // Simulate unusual activity
+        function simulateUnusualActivity() {
+            if (!isEmergencyActive) {
+                // Update detection status
+                document.getElementById('gesture-status').textContent = 'UNUSUAL MOVEMENT - Checking...';
+                document.getElementById('gesture-status').className = 'detection-status detection-warning';
+                
+                // Add alert
+                addAlert('warning', 'Unusual movement pattern detected', 'AI gesture analysis');
+                
+                // Return to normal after 5 seconds
+                setTimeout(function() {
+                    if (gestureDetectionActive) {
+                        document.getElementById('gesture-status').textContent = 'ACTIVE - Normal movement';
+                        document.getElementById('gesture-status').className = 'detection-status detection-active';
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Update detection status based on toggles
+        function updateDetectionStatus() {
+            if (audioDetectionActive) {
+                document.getElementById('audio-status').textContent = 'ACTIVE - No threats detected';
+                document.getElementById('audio-status').className = 'detection-status detection-active';
+            } else {
+                document.getElementById('audio-status').textContent = 'DISABLED - Manual mode';
+                document.getElementById('audio-status').className = 'detection-status';
+            }
+            
+            if (gestureDetectionActive) {
+                document.getElementById('gesture-status').textContent = 'ACTIVE - Normal movement';
+                document.getElementById('gesture-status').className = 'detection-status detection-active';
+            } else {
+                document.getElementById('gesture-status').textContent = 'DISABLED - Manual mode';
+                document.getElementById('gesture-status').className = 'detection-status';
+            }
+        }
+        
+        // Create a test alert
+        function createTestAlert() {
+            const locationText = document.getElementById('current-location').textContent;
+            const testAlert = {
+                id: alerts.length + 1,
+                type: 'info',
+                message: 'TEST ALERT: System check successful',
+                time: 'Just now',
+                location: locationText
+            };
+            
+            alerts.unshift(testAlert);
+            loadAlerts();
+            
+            alert('Test alert created successfully!\n\nThis simulates how the system would work in a real emergency.');
+        }
+        
+        // Share current location
+        function shareCurrentLocation() {
+            const locationText = document.getElementById('current-location').textContent;
+            const shareText = `I'm currently at: ${locationText}. My SafeGuard AI is active.`;
+            
+            if (navigator.share) {
+                // Use Web Share API on mobile
+                navigator.share({
+                    title: 'My Current Location',
+                    text: shareText,
+                    url: window.location.href
+                })
+                .then(() => {
+                    addAlert('info', 'Location shared successfully', 'Sharing Feature');
+                })
+                .catch(error => {
+                    console.log('Sharing failed:', error);
+                    fallbackShare(shareText);
+                });
+            } else {
+                // Fallback for desktop
+                fallbackShare(shareText);
+            }
+        }
+        
+        function fallbackShare(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        alert('Location copied to clipboard! You can now paste it in messages.');
+                        addAlert('info', 'Location copied to clipboard', 'Sharing Feature');
+                    })
+                    .catch(err => {
+                        console.error('Clipboard error:', err);
+                        alert(`Share this location:\n\n${text}`);
+                    });
+            } else {
+                alert(`Share this location:\n\n${text}`);
+            }
+        }
+        
+        // Add a new alert
+        function addAlert(type, message, location) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const newAlert = {
+                id: alerts.length + 1,
+                type: type,
+                message: message,
+                time: timeString,
+                location: location
+            };
+            
+            alerts.unshift(newAlert);
+            loadAlerts();
+        }
+        
+        // Save new contact
+        function saveNewContact() {
+            const name = document.getElementById('contactName').value;
+            const phone = document.getElementById('contactPhone').value;
+            const relationship = document.getElementById('contactRelationship').value;
+            
+            if (!name || !phone) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Validate phone number (basic)
+            const phoneRegex = /^[\d\s\-\+\(\)]{10,}$/;
+            if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
+                alert('Please enter a valid phone number');
+                return;
+            }
+            
+            // Create avatar from initials
+            const nameParts = name.split(' ');
+            const avatar = nameParts.length > 1 ? 
+                nameParts[0].charAt(0) + nameParts[1].charAt(0) : 
+                name.substring(0, 2);
+            
+            const newContact = {
+                id: emergencyContacts.length + 1,
+                name: name,
+                phone: phone.replace(/\s/g, ''),
+                relationship: relationship,
+                avatar: avatar.toUpperCase()
+            };
+            
+            emergencyContacts.push(newContact);
+            loadContacts();
+            
+            // Close modal and clear form
+            document.getElementById('contactModal').style.display = 'none';
+            clearContactForm();
+            
+            alert(`Contact ${name} added successfully!`);
+            addAlert('info', `New contact added: ${name}`, 'Contacts');
+        }
+        
+        // Clear contact form
+        function clearContactForm() {
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactPhone').value = '';
+            document.getElementById('contactRelationship').value = 'family';
+        }
+        
+        // Calculate safe route
+        function calculateSafeRoute() {
+            const destination = document.getElementById('destinationSelect').value;
+            
+            if (!destination) {
+                alert('Please select a destination');
+                return;
+            }
+            
+            const destinationNames = {
+                'home': 'Home',
+                'work': 'Workplace',
+                'college': 'College',
+                'mall': 'Shopping Mall',
+                'other': 'Custom Destination'
+            };
+            
+            const currentLocation = document.getElementById('current-location').textContent;
+            
+            alert(`Calculating safest route from:\n${currentLocation}\n\nto:\n${destinationNames[destination]}\n\nBased on:\n- Current crime statistics\n- Time of day\n- Street lighting data\n- Recent incident reports\n\nRoute calculated with 94% safety score.`);
+            
+            // Add alert
+            addAlert('info', `Safe route calculated to ${destinationNames[destination]}`, 'Route Planning');
+        }
+        
+        // Simulate emergency notifications
+        function simulateEmergencyNotifications(location) {
+            console.log('Simulating notifications to all contacts...');
+            
+            emergencyContacts.forEach(contact => {
+                console.log(`Alert sent to ${contact.name} at ${contact.phone}: Emergency at ${location}`);
+            });
+            
+            console.log('Alert sent to local police authorities');
+            console.log('Alert sent to nearby SafeGuard users');
+            
+            // Simulate SMS sending (in real app would use Twilio or similar)
+            if (isMobileDevice()) {
+                console.log('Mobile device detected - would send real SMS');
+            }
+        }
+        
+        // Detect device type
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        
+        // Initialize based on device
+        if (isMobileDevice()) {
+            console.log("Mobile device detected - optimizing for touch");
+            document.body.classList.add('mobile-device');
+        } else {
+            console.log("Desktop device detected");
+            document.body.classList.add('desktop-device');
+        }
+    </script>
+</body>
+</html>
