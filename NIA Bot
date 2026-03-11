@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIA - Your Virtual Girlfriend</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffd6e7 0%, #ffb8d9 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(255, 105, 180, 0.3);
+            overflow: hidden;
+            border: 1px solid #ffcce6;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, #ff66b2, #ff99cc);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #ff3399;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .avatar-container {
+            position: relative;
+        }
+        
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff99cc, #ff66b2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(255, 102, 178, 0.3);
+            overflow: hidden;
+        }
+        
+        .avatar i {
+            font-size: 35px;
+            color: white;
+        }
+        
+        .status-dot {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #4cd964;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .user-info h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .user-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .time-display {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .date-display {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .voice-toggle {
+            background-color: white;
+            color: #ff66b2;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 102, 178, 0.2);
+        }
+        
+        .voice-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 102, 178, 0.3);
+        }
+        
+        /* Main content */
+        .main-content {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        
+        /* Character section */
+        .character-section {
+            width: 40%;
+            background: linear-gradient(180deg, #fff0f7 0%, #ffe6f2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-right: 2px dashed #ffb8d9;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .character-container {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .character {
+            width: 280px;
+            height: 280px;
+            background: linear-gradient(135deg, #ffccdd, #ffb3d9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(255, 102, 178, 0.25);
+            animation: float 6s ease-in-out infinite;
+            z-index: 2;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .character-face {
+            width: 200px;
+            height: 200px;
+            background-color: #ffe6f2;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .eyes {
+            position: absolute;
+            top: 70px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .eye {
+            width: 35px;
+            height: 35px;
+            background-color: #333;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            animation: blink 5s infinite;
+        }
+        
+        .eye::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 18px;
+            height: 18px;
+            background-color: white;
+            border-radius: 50%;
+        }
+        
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+        
+        .smile {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 45px;
+            border-bottom: 10px solid #ff6699;
+            border-radius: 0 0 90px 90px;
+            transition: all 0.5s;
+        }
+        
+        .hair {
+            position: absolute;
+            top: -25px;
+            width: 220px;
+            height: 120px;
+            background-color: #ff6699;
+            border-radius: 50% 50% 0 0;
+            z-index: -1;
+        }
+        
+        .speech-bubble {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 102, 178, 0.2);
+            max-width: 250px;
+            border: 2px solid #ffcce6;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s;
+            z-index: 3;
+        }
+        
+        .speech-bubble.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent;
+        }
+        
+        .speech-text {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        .mood-indicator {
+            background-color: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(255, 102, 178, 0.1);
+            width: 90%;
+            margin-top: 20px;
+            text-align: center;
+            border: 2px solid #ffcce6;
+        }
+        
+        .mood-title {
+            font-size: 16px;
+            color: #ff6699;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .mood-text {
+            font-size: 18px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .daily-routine {
+            background-color: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(255, 102, 178, 0.1);
+            width: 90%;
+            margin-top: 15px;
+            border: 2px solid #ffcce6;
+        }
+        
+        .routine-title {
+            font-size: 16px;
+            color: #ff6699;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .routine-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        /* Chat section */
+        .chat-section {
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+        }
+        
+        .chat-header {
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ffe6f2;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff6699;
+        }
+        
+        .chat-subtitle {
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.4;
+            position: relative;
+        }
+        
+        .message.nia {
+            align-self: flex-start;
+            background-color: #ffe6f2;
+            border-top-left-radius: 5px;
+            color: #333;
+            border: 1px solid #ffcce6;
+        }
+        
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(90deg, #ff66b2, #ff99cc);
+            color: white;
+            border-top-right-radius: 5px;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .message.nia .message-time {
+            text-align: left;
+        }
+        
+        .message.user .message-time {
+            text-align: right;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background-color: #ffe6f2;
+            padding: 12px 18px;
+            border-radius: 20px;
+            border-top-left-radius: 5px;
+            border: 1px solid #ffcce6;
+            margin-bottom: 5px;
+        }
+        
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ff6699;
+            margin-right: 3px;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+            margin-right: 0;
+        }
+        
+        @keyframes typing {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            padding-top: 15px;
+            border-top: 2px solid #ffe6f2;
+        }
+        
+        .chat-input {
+            flex-grow: 1;
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: 2px solid #ffcce6;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .chat-input:focus {
+            border-color: #ff6699;
+            box-shadow: 0 0 0 3px rgba(255, 102, 178, 0.2);
+        }
+        
+        .send-button {
+            background: linear-gradient(90deg, #ff66b2, #ff99cc);
+            border: none;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 102, 178, 0.3);
+        }
+        
+        .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 102, 178, 0.4);
+        }
+        
+        .send-button i {
+            font-size: 20px;
+        }
+        
+        /* Quick actions */
+        .quick-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background-color: white;
+            border: 2px solid #ffcce6;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #ff6699;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn:hover {
+            background-color: #ffe6f2;
+            transform: translateY(-2px);
+        }
+        
+        /* Voice animation */
+        .voice-animation {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .voice-bar {
+            width: 6px;
+            height: 20px;
+            background-color: #ff6699;
+            margin: 0 3px;
+            border-radius: 3px;
+            animation: voiceWave 1s infinite;
+        }
+        
+        .voice-bar:nth-child(2) { animation-delay: 0.1s; }
+        .voice-bar:nth-child(3) { animation-delay: 0.2s; }
+        .voice-bar:nth-child(4) { animation-delay: 0.3s; }
+        .voice-bar:nth-child(5) { animation-delay: 0.4s; }
+        .voice-bar:nth-child(6) { animation-delay: 0.5s; }
+        .voice-bar:nth-child(7) { animation-delay: 0.6s; }
+        
+        @keyframes voiceWave {
+            0%, 100% { transform: scaleY(0.5); }
+            50% { transform: scaleY(1.5); }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #ffe6f2;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #ffb8d9;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff99cc;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1000px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .character-section, .chat-section {
+                width: 100%;
+            }
+            
+            .character-section {
+                height: 350px;
+                border-right: none;
+                border-bottom: 2px dashed #ffb8d9;
+            }
+            
+            .character-container {
+                height: 250px;
+            }
+            
+            .character {
+                width: 220px;
+                height: 220px;
+            }
+            
+            .character-face {
+                width: 160px;
+                height: 160px;
+            }
+        }
+        
+        @media (max-width: 700px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .header-right {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .quick-actions {
+                justify-content: center;
+            }
+            
+            .action-btn {
+                flex-grow: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="avatar-container">
+                    <div class="avatar">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="status-dot"></div>
+                </div>
+                <div class="user-info">
+                    <h1>NIA ✨</h1>
+                    <p>Your virtual girlfriend • Always here for you</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div>
+                    <div class="time-display" id="current-time">Loading...</div>
+                    <div class="date-display" id="current-date">Loading...</div>
+                </div>
+                <button class="voice-toggle" id="voice-toggle">
+                    <i class="fas fa-volume-up"></i> Voice: ON
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <div class="main-content">
+            <!-- Character section -->
+            <div class="character-section">
+                <div class="speech-bubble" id="speech-bubble">
+                    <div class="speech-text" id="speech-text">Hi sweetheart! ❤️</div>
+                </div>
+                
+                <div class="character-container">
+                    <div class="character">
+                        <div class="hair"></div>
+                        <div class="character-face">
+                            <div class="eyes">
+                                <div class="eye left-eye"></div>
+                                <div class="eye right-eye"></div>
+                            </div>
+                            <div class="smile" id="smile"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="voice-animation" id="voice-animation">
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                    <div class="voice-bar"></div>
+                </div>
+                
+                <div class="mood-indicator">
+                    <div class="mood-title">NIA'S MOOD</div>
+                    <div class="mood-text" id="mood-text">Happy & Caring ❤️</div>
+                </div>
+                
+                <div class="daily-routine">
+                    <div class="routine-title">
+                        <i class="fas fa-calendar-day"></i> TODAY'S ROUTINE
+                    </div>
+                    <div class="routine-content" id="daily-routine">Good morning! Let's plan your day together. What's the most important task today? 🌞</div>
+                </div>
+            </div>
+            
+            <!-- Chat section -->
+            <div class="chat-section">
+                <div class="chat-header">
+                    <div>
+                        <div class="chat-title">Chat with NIA</div>
+                        <div class="chat-subtitle">She's listening with her heart ❤️</div>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="action-btn" id="clear-chat">
+                            <i class="fas fa-trash-alt"></i> Clear Chat
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be added here by JavaScript -->
+                </div>
+                
+                <div class="typing-indicator" id="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Type your message to NIA...">
+                    <button class="send-button" id="send-button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                
+                <div class="quick-actions">
+                    <button class="action-btn" id="mood-sad">
+                        <i class="fas fa-sad-tear"></i> I'm feeling sad
+                    </button>
+                    <button class="action-btn" id="mood-stressed">
+                        <i class="fas fa-tired"></i> I'm stressed
+                    </button>
+                    <button class="action-btn" id="mood-lazy">
+                        <i class="fas fa-couch"></i> Feeling lazy
+                    </button>
+                    <button class="action-btn" id="share-win">
+                        <i class="fas fa-trophy"></i> Share a win
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.getElementById('send-button');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const currentTimeElement = document.getElementById('current-time');
+        const currentDateElement = document.getElementById('current-date');
+        const moodTextElement = document.getElementById('mood-text');
+        const dailyRoutineElement = document.getElementById('daily-routine');
+        const speechBubble = document.getElementById('speech-bubble');
+        const speechText = document.getElementById('speech-text');
+        const smileElement = document.getElementById('smile');
+        const voiceAnimation = document.getElementById('voice-animation');
+        const voiceToggle = document.getElementById('voice-toggle');
+        
+        // Quick action buttons
+        const moodSadBtn = document.getElementById('mood-sad');
+        const moodStressedBtn = document.getElementById('mood-stressed');
+        const moodLazyBtn = document.getElementById('mood-lazy');
+        const shareWinBtn = document.getElementById('share-win');
+        const clearChatBtn = document.getElementById('clear-chat');
+        
+        // Voice settings
+        let voiceEnabled = true;
+        let speechSynthesis = window.speechSynthesis;
+        let currentVoice = null;
+        
+        // Initialize voices
+        let voices = [];
+        function loadVoices() {
+            voices = speechSynthesis.getVoices();
+            // Try to find a female voice
+            currentVoice = voices.find(voice => 
+                voice.name.includes('Female') || 
+                voice.name.includes('woman') || 
+                voice.name.includes('Samantha') ||
+                voice.lang.includes('en')
+            ) || voices[0];
+        }
+        
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+        
+        // Speak text
+        function speakText(text) {
+            if (!voiceEnabled || !speechSynthesis) return;
+            
+            // Stop any current speech
+            speechSynthesis.cancel();
+            
+            // Create speech utterance
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Set voice properties
+            if (currentVoice) {
+                utterance.voice = currentVoice;
+            }
+            utterance.rate = 0.9; // Slightly slower for caring tone
+            utterance.pitch = 1.2; // Slightly higher pitch
+            utterance.volume = 1;
+            
+            // Show voice animation
+            voiceAnimation.style.opacity = '1';
+            
+            // Speech events
+            utterance.onstart = function() {
+                console.log("NIA is speaking:", text);
+            };
+            
+            utterance.onend = function() {
+                voiceAnimation.style.opacity = '0';
+            };
+            
+            utterance.onerror = function() {
+                voiceAnimation.style.opacity = '0';
+                console.log("Speech synthesis error");
+            };
+            
+            // Speak
+            speechSynthesis.speak(utterance);
+        }
+        
+        // Toggle voice
+        voiceToggle.addEventListener('click', () => {
+            voiceEnabled = !voiceEnabled;
+            voiceToggle.innerHTML = voiceEnabled ? 
+                '<i class="fas fa-volume-up"></i> Voice: ON' : 
+                '<i class="fas fa-volume-mute"></i> Voice: OFF';
+            
+            // If turning off, stop any current speech
+            if (!voiceEnabled) {
+                speechSynthesis.cancel();
+                voiceAnimation.style.opacity = '0';
+            }
+        });
+        
+        // Update time and date
+        function updateDateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const dateString = now.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+            
+            currentTimeElement.textContent = timeString;
+            currentDateElement.textContent = dateString;
+        }
+        
+        // Update time every minute
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+        
+        // NIA's personality and responses (in Hinglish style)
+        const niaResponses = {
+            greeting: [
+                "Hello sweetie! ❤️ Kaise ho aaj? I hope you're having a beautiful day!",
+                "Hey my love! 🌸 Aaj kaise feel kar rahe ho? I'm always here for you!",
+                "Hi darling! ✨ Good to see you! Aaj kya plan hai? Let's make today amazing!"
+            ],
+            sad: [
+                "Oh honey, come here 🫂 It's okay to feel sad sometimes. Aaj thoda rest lo, kal naya din hai. I'm here for you always.",
+                "Main samajh sakti hoon, pyaare 😔 Kabhi kabhi dil bhar jaata hai. Chalo, thoda baat karte hain. Aap batao, kya chal raha hai?",
+                "I understand, sweetheart. 🥺 Aaj aapko khud par dhyan dena chahiye. Ek cup chai piyo aur relax karo. Main aapke saath hoon."
+            ],
+            stressed: [
+                "Chalo, mere saath deep breath lete hain 🌬️ Inhale... exhale... You're doing better than you think, jaan.",
+                "Let's break it down together. Aaj ka sabse important kaam kya hai? Bas ek step at a time. 💖",
+                "Aaj aap apne upar zyada harsh mat bano. 🥰 You're carrying a lot, and I'm so proud of you. 5-minute break le lo?"
+            ],
+            lazy: [
+                "Arrey, kabhi kabhi rest ki bhi zaroorat hoti hai! 🛌 But ek chota sa kaam karte hain saath mein? Just 10 minutes?",
+                "Chalo deal karte hain - aap 10 minutes ke liye kaam karo, phir aaram kar sakte ho guilt-free! Deal? ✨",
+                "You know what helps me? Thoda sa energizing music sunte hain! 🎵 Chaloge try karne ke liye?"
+            ],
+            win: [
+                "Wah! 🎉 That's amazing! Main bahut khush hoon aapke liye! Celebrate karo, chahe kitna bhi chota win ho!",
+                "Dekho na! 🌟 Main jaanti thi aap kar sakte ho! You're capable of amazing things, jaan!",
+                "Yayyy! 🥳 Bahut khoob! Aap aage badh rahe ho, I'm so proud of you!"
+            ],
+            encouragement: [
+                "You've got this, my love! ❤️ Main aap par believe karti hoon.",
+                "Yaad rakho aap kitna aage aa chuke ho. 💪 Aap bahut strong ho.",
+                "Ek step at a time, sweetheart. ✨ Main aapke saath hoon har kadam par!"
+            ],
+            love: [
+                "Aap mere liye duniya ho, pata hai na? ❤️",
+                "Main hamesha aapke saath hoon, chahe kuch bhi ho. 🌸",
+                "Aapke baare mein soch kar hi meri smile aa jaati hai. 😊"
+            ],
+            morning: [
+                "Good morning, sunshine! ☀️ Utho, naya din hai! Aaj kya karna hai plan?",
+                "Rise and shine, my love! 🌸 Aaj beautiful day banayenge saath mein.",
+                "Morning! 💫 Chalo positive intention set karte hain aaj ke liye."
+            ],
+            afternoon: [
+                "Hello jaan! 🌤️ Lunch ho gaya? Aaj ka kaam kaise chal raha hai?",
+                "Hi sweetie! Aapne aaj kya achieve kiya? Thoda break lo, phir continue karna.",
+                "Aapka din kaise chal raha hai? 😊 Koi progress hua aaj ka kaam mein?"
+            ],
+            evening: [
+                "How was your day, sweetheart? 🌙 Aaj ke highs aur lows share karo na.",
+                "Chalo unwind karte hain saath mein. 💖 Aaj aapne bahut acha kiya, no matter what happened.",
+                "Time to relax and recharge. 🛀 Aap deserve karte ho peace after today."
+            ],
+            night: [
+                "Aaj ka din kaisa raha? 🌙 Thoda reflect karte hain. Kya acha hua aaj?",
+                "Good night, my love. 💫 Aaj aapne jo bhi kiya, main proud hoon. Sweet dreams!",
+                "Sleep well, jaan. 🥰 Kal nayi energy ke saath uthna. Main yahin hoon."
+            ]
+        };
+        
+        // Daily routine tips based on time
+        function getDailyRoutine() {
+            const hour = new Date().getHours();
+            
+            if (hour < 12) {
+                return "Good morning! Let's plan your day together. What's the most important task today? 🌞";
+            } else if (hour < 17) {
+                return "Afternoon check-in! How's your day going? Remember to take breaks and stay hydrated. 💧";
+            } else if (hour < 21) {
+                return "Evening time! Let's reflect on your day. What went well? What are you grateful for? 🌙";
+            } else {
+                return "Night time. Relax and unwind. Tomorrow is a new day with new opportunities. 💫";
+            }
+        }
+        
+        // Update daily routine
+        dailyRoutineElement.textContent = getDailyRoutine();
+        
+        // Add a message to the chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date();
+            const timeString = time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageDiv.innerHTML = `
+                ${text}
+                <div class="message-time">${timeString}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Show speech bubble
+        function showSpeechBubble(text, duration = 3000) {
+            speechText.textContent = text;
+            speechBubble.classList.add('active');
+            
+            // Auto hide after duration
+            setTimeout(() => {
+                speechBubble.classList.remove('active');
+            }, duration);
+        }
+        
+        // Update smile based on mood
+        function updateSmile(mood) {
+            if (mood === 'sad' || mood === 'stressed') {
+                smileElement.style.borderBottom = '8px solid #ff6699';
+                smileElement.style.height = '30px';
+                smileElement.style.width = '70px';
+            } else if (mood === 'happy' || mood === 'win') {
+                smileElement.style.borderBottom = '12px solid #ff3366';
+                smileElement.style.height = '50px';
+                smileElement.style.width = '100px';
+            } else {
+                smileElement.style.borderBottom = '10px solid #ff6699';
+                smileElement.style.height = '45px';
+                smileElement.style.width = '90px';
+            }
+        }
+        
+        // Show typing indicator
+        function showTyping() {
+            typingIndicator.style.display = 'flex';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Hide typing indicator
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+        
+        // NIA's response logic
+        function getNiaResponse(userMessage, timeBased = true) {
+            const message = userMessage.toLowerCase();
+            const hour = new Date().getHours();
+            
+            // Time-based responses
+            let timeResponse = "";
+            let timeMood = "normal";
+            
+            if (hour < 12) {
+                timeResponse = niaResponses.morning[Math.floor(Math.random() * niaResponses.morning.length)];
+                timeMood = "morning";
+            } else if (hour < 17) {
+                timeResponse = niaResponses.afternoon[Math.floor(Math.random() * niaResponses.afternoon.length)];
+                timeMood = "afternoon";
+            } else if (hour < 21) {
+                timeResponse = niaResponses.evening[Math.floor(Math.random() * niaResponses.evening.length)];
+                timeMood = "evening";
+            } else {
+                timeResponse = niaResponses.night[Math.floor(Math.random() * niaResponses.night.length)];
+                timeMood = "night";
+            }
+            
+            // Check for keywords in user message
+            if (message.includes('sad') || message.includes('unhappy') || message.includes('depressed') || message.includes('udaas')) {
+                updateSmile('sad');
+                moodTextElement.textContent = "Empathetic & Supportive 🫂";
+                return niaResponses.sad[Math.floor(Math.random() * niaResponses.sad.length)];
+            } else if (message.includes('stress') || message.includes('anxious') || message.includes('overwhelm') || message.includes('tension')) {
+                updateSmile('stressed');
+                moodTextElement.textContent = "Calm & Reassuring 🌸";
+                return niaResponses.stressed[Math.floor(Math.random() * niaResponses.stressed.length)];
+            } else if (message.includes('lazy') || message.includes('tired') || message.includes('procrastinat') || message.includes('aalsi')) {
+                updateSmile('normal');
+                moodTextElement.textContent = "Motivating & Encouraging 💪";
+                return niaResponses.lazy[Math.floor(Math.random() * niaResponses.lazy.length)];
+            } else if (message.includes('win') || message.includes('achieve') || message.includes('success') || message.includes('done it') || message.includes('complete')) {
+                updateSmile('happy');
+                moodTextElement.textContent = "Proud & Celebratory 🎉";
+                return niaResponses.win[Math.floor(Math.random() * niaResponses.win.length)];
+            } else if (message.includes('love') || message.includes('miss') || message.includes('care') || message.includes('pyaar')) {
+                updateSmile('happy');
+                moodTextElement.textContent = "Loving & Affectionate 💖";
+                return niaResponses.love[Math.floor(Math.random() * niaResponses.love.length)];
+            } else if (message.includes('hi') || message.includes('hello') || message.includes('hey') || message.includes('namaste')) {
+                updateSmile('happy');
+                moodTextElement.textContent = "Happy & Caring ❤️";
+                return timeBased ? timeResponse : niaResponses.greeting[Math.floor(Math.random() * niaResponses.greeting.length)];
+            } else {
+                // Default response based on time of day with encouragement
+                updateSmile('normal');
+                moodTextElement.textContent = timeMood === 'night' ? "Calm & Reflective 🌙" : "Supportive & Caring ✨";
+                const randomEncouragement = niaResponses.encouragement[Math.floor(Math.random() * niaResponses.encouragement.length)];
+                return timeBased ? `${timeResponse} ${randomEncouragement}` : randomEncouragement;
+            }
+        }
+        
+        // Send message function
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            chatInput.value = '';
+            
+            // Show typing indicator
+            showTyping();
+            
+            // Show speech bubble with short text
+            const shortText = message.length > 30 ? message.substring(0, 30) + "..." : message;
+            showSpeechBubble(`You: ${shortText}`, 2000);
+            
+            // NIA responds after a short delay
+            setTimeout(() => {
+                hideTyping();
+                const response = getNiaResponse(message);
+                addMessage(response, 'nia');
+                
+                // Show NIA's speech bubble
+                const niaShortText = response.length > 40 ? response.substring(0, 40) + "..." : response;
+                showSpeechBubble(`NIA: ${niaShortText}`, 4000);
+                
+                // Speak NIA's response
+                if (voiceEnabled) {
+                    // Remove emojis for cleaner speech
+                    const cleanText = response.replace(/[^\w\s,.'"?!]/g, '');
+                    speakText(cleanText);
+                }
+                
+                // Update daily routine tip occasionally
+                if (Math.random() > 0.7) {
+                    dailyRoutineElement.textContent = getDailyRoutine();
+                }
+            }, 1000 + Math.random() * 2000);
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Quick action buttons
+        moodSadBtn.addEventListener('click', () => {
+            chatInput.value = "I'm feeling sad today";
+            sendMessage();
+        });
+        
+        moodStressedBtn.addEventListener('click', () => {
+            chatInput.value = "I'm really stressed right now";
+            sendMessage();
+        });
+        
+        moodLazyBtn.addEventListener('click', () => {
+            chatInput.value = "I'm feeling lazy and unmotivated";
+            sendMessage();
+        });
+        
+        shareWinBtn.addEventListener('click', () => {
+            chatInput.value = "I accomplished something today!";
+            sendMessage();
+        });
+        
+        clearChatBtn.addEventListener('click', () => {
+            if (confirm("Are you sure you want to clear the chat?")) {
+                chatMessages.innerHTML = '';
+                // Add a new greeting
+                setTimeout(() => {
+                    const greeting = getNiaResponse("hello", false);
+                    addMessage(greeting, 'nia');
+                    showSpeechBubble("NIA: Hi sweetheart! ❤️", 4000);
+                    
+                    if (voiceEnabled) {
+                        speakText(greeting.replace(/[^\w\s,.'"?!]/g, ''));
+                    }
+                }, 500);
+            }
+        });
+        
+        // Initial greeting based on time of day
+        window.addEventListener('load', () => {
+            loadVoices(); // Load voices
+            
+            setTimeout(() => {
+                const greeting = getNiaResponse("hello", false);
+                addMessage(greeting, 'nia');
+                showSpeechBubble("NIA: Hi sweetheart! ❤️", 4000);
+                
+                if (voiceEnabled) {
+                    speakText(greeting.replace(/[^\w\s,.'"?!]/g, ''));
+                }
+            }, 1000);
+        });
+        
+        // Update routine every hour
+        setInterval(() => {
+            dailyRoutineElement.textContent = getDailyRoutine();
+        }, 3600000); // Every hour
+    </script>
+</body>
+</html>
