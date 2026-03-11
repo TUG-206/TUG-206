@@ -1,0 +1,381 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+शिवताण्डवस्तोत्रम् - Shiv Tandav Stotram
+Python Version with Devanagari Display
+Author: Ravana (Traditional)
+Python Implementation: N.O.V.A
+"""
+
+import os
+import sys
+import time
+import platform
+from datetime import datetime
+
+# Try to import colorama for cross-platform colored output
+try:
+    from colorama import init, Fore, Back, Style
+    init(autoreset=True)
+    COLORS_AVAILABLE = True
+except ImportError:
+    COLORS_AVAILABLE = False
+    # Create dummy color classes
+    class Fore:
+        RED = YELLOW = GREEN = CYAN = MAGENTA = BLUE = WHITE = BLACK = RESET = ''
+    class Back:
+        BLACK = RED = YELLOW = GREEN = CYAN = MAGENTA = BLUE = WHITE = RESET = ''
+    class Style:
+        BRIGHT = DIM = NORMAL = RESET_ALL = ''
+
+# Check if running in a terminal that supports Unicode
+def supports_unicode():
+    return platform.system() != 'Windows' or sys.stdout.encoding.lower() in ('utf-8', 'utf8')
+
+# Shiv Tandav Stotram verses in Sanskrit (Devanagari)
+SHIV_TANDAV_VERSES = [
+    {
+        "number": "१",
+        "sanskrit": """जटाटवीगलज्जलप्रवाहपावितस्थले
+गलेऽवलम्ब्य लम्बितां भुजङ्गतुङ्गमालिकाम् ।
+डमड्डमड्डमड्डमन्निनादवड्डमर्वयं
+चकार चण्डताण्डवं तनोतु नः शिवः शिवम् ॥"""
+    },
+    {
+        "number": "२",
+        "sanskrit": """जटाकटाहसम्भ्रमभ्रमन्निलिम्पनिर्झरी
+विलोलवीचिवल्लरीविराजमानमूर्धनि ।
+धगद्धगद्धगज्ज्वलल्ललाटपट्टपावके
+किशोरचन्द्रशेखरे रतिः प्रतिक्षणं मम ॥"""
+    },
+    {
+        "number": "३",
+        "sanskrit": """धराधरेन्द्रनन्दिनीविलासबन्धुबन्धुर
+स्फुरद्दिगन्तसन्ततिप्रमोदमानमानसे ।
+कृपाकटाक्षधोरणीनिरुद्धदुर्धरापदि
+क्वचिद्दिगम्बरे मनो विनोदमेतु वस्तुनि ॥"""
+    },
+    {
+        "number": "४",
+        "sanskrit": """जटाभुजङ्गपिङ्गलस्फुरत्फणामणिप्रभा
+कदम्बकुङ्कुमद्रवप्रलिप्तदिग्वधूमुखे ।
+मदान्धसिन्धुरस्फुरत्त्वगुत्तरीयमेदुरे
+मनो विनोदमद्भुतं बिभर्तु भूतभर्तरि ॥"""
+    },
+    {
+        "number": "५",
+        "sanskrit": """सहस्रलोचनप्रभृत्यशेषलेखशेखर
+प्रसूनधूलिधोरणी विधूसराङ्घ्रिपीठभूः ।
+भुजङ्गराजमालया निबद्धजाटजूटक
+श्रियै चिराय जायतां चकोरबन्धुशेखरः ॥"""
+    },
+    {
+        "number": "६",
+        "sanskrit": """ललाटचत्वरज्वलद्धनञ्जयस्फुलिङ्गभा
+निपीतपञ्चसायकं नमन्निलिम्पनायकम् ।
+सुधामयूखलेखया विराजमानशेखरं
+महाकपालिसम्पदेशिरोजटालमस्तु नः ॥"""
+    },
+    {
+        "number": "७",
+        "sanskrit": """करालभालपट्टिकाधगद्धगद्धगज्ज्वल
+द्धनञ्जयाहुतीकृतप्रचण्डपञ्चसायके ।
+धराधरेन्द्रनन्दिनीकुचाग्रचित्रपत्रक
+प्रकल्पनैकशिल्पिनि त्रिलोचने रतिर्मम ॥"""
+    },
+    {
+        "number": "८",
+        "sanskrit": """नवीनमेघमण्डली निरुद्धदुर्धरस्फुरत्
+कुहूनिशीथिनीतमः प्रबन्धबद्धकन्धरः ।
+निलिम्पनिर्झरीधरस्तनोतु कृत्तिसिन्धुरः
+कलानिधानबन्धुरः श्रियं जगद्धुरंधरः ॥"""
+    },
+    {
+        "number": "९",
+        "sanskrit": """प्रफुल्लनीलपङ्कजप्रपञ्चकालिमप्रभा
+वलम्बिकण्ठकन्दलीरुचिप्रबद्धकन्धरम् ।
+स्मरच्छिदं पुरच्छिदं भवच्छिदं मखच्छिदं
+गजच्छिदान्धकच्छिदं तमन्तकच्छिदं भजे ॥"""
+    },
+    {
+        "number": "१०",
+        "sanskrit": """अखर्वसर्वमङ्गलाकलाकदम्बमञ्जरी
+रसप्रवाहमाधुरी विजृम्भणामधुव्रतम् ।
+स्मरान्तकं पुरान्तकं भवान्तकं मखान्तकं
+गजान्तकान्धकान्तकं तमन्तकान्तकं भजे ॥"""
+    },
+    {
+        "number": "११",
+        "sanskrit": """जयत्वदभ्रविभ्रमभ्रमद्भुजङ्गमश्वस
+द्विनिर्गमत्क्रमस्फुरत्करालभालहव्यवाट् ।
+धिमिद्धिमिद्धिमिध्वनन्मृदङ्गतुङ्गमङ्गल
+ध्वनिक्रमप्रवर्तित प्रचण्डताण्डवः शिवः ॥"""
+    },
+    {
+        "number": "१२",
+        "sanskrit": """दृषद्विचित्रतल्पयोर्भुजङ्गमौक्तिकस्रजोः
+गरिष्ठरत्नलोष्ठयोः सुहृद्विपक्षपक्षयोः ।
+तृणारविन्दचक्षुषोः प्रजामहीमहेन्द्रयोः
+समप्रवृत्तिकः कदा सदाशिवं भजाम्यहम् ॥"""
+    },
+    {
+        "number": "१३",
+        "sanskrit": """कदा निलिम्पनिर्झरीनिकुञ्जकोटरे वसन्
+विमुक्तदुर्मतिः सदा शिरःस्थमञ्जलिं वहन् ।
+विमुक्तलोललोचनो ललामभाललग्नकः
+शिवेति मन्त्रमुच्चरन् कदा सुखी भवाम्यहम् ॥"""
+    },
+    {
+        "number": "१४",
+        "sanskrit": """इमं हि नित्यमेवमुक्तमुत्तमोत्तमं स्तवं
+पठन्स्मरन्ब्रुवन्नरो विशुद्धिमेतिसंततम् ।
+हरे गुरौ सुभक्तिमाशु याति नान्यथा गतिं
+विमोहनं हि देहिनां सुशङ्करस्य चिन्तनम् ॥"""
+    },
+    {
+        "number": "१५",
+        "sanskrit": """पूजावसानसमये दशवक्त्रगीतं
+यः शम्भुपूजनपरं पठति प्रदोषे ।
+तस्य स्थिरां रथगजेन्द्रतुरङ्गयुक्तां
+लक्ष्मीं सदैव सुमुखीं प्रददाति शम्भुः ॥"""
+    }
+]
+
+# Stotram information
+STOTRAM_INFO = {
+    "title": "शिवताण्डवस्तोत्रम्",
+    "subtitle": "॥ श्रीरावणकृतम् ॥",
+    "footer": "॥ इति श्रीरावणकृतं शिवताण्डवस्तोत्रं सम्पूर्णम् ॥",
+    "attribution": "✧ रावणेन विरचितं शिवस्तोत्रम् ✧",
+    "description": "The Shiv Tandav Stotram is a hymn of praise to Lord Shiva composed by Ravana, the king of Lanka.",
+    "total_verses": 15
+}
+
+def clear_screen():
+    """Clear the terminal screen"""
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def print_colored(text, color=Fore.YELLOW, brightness=Style.NORMAL, end='\n'):
+    """Print colored text if colorama is available"""
+    if COLORS_AVAILABLE:
+        print(f"{brightness}{color}{text}{Style.RESET_ALL}", end=end)
+    else:
+        print(text, end=end)
+
+def print_header():
+    """Print the stotram header"""
+    width = 80
+    print_colored("=" * width, Fore.CYAN, Style.BRIGHT)
+    print_colored(STOTRAM_INFO["title"].center(width), Fore.YELLOW, Style.BRIGHT)
+    print_colored(STOTRAM_INFO["subtitle"].center(width), Fore.GREEN)
+    print_colored("=" * width, Fore.CYAN, Style.BRIGHT)
+    print()
+
+def print_footer():
+    """Print the stotram footer"""
+    width = 80
+    print()
+    print_colored("=" * width, Fore.CYAN, Style.BRIGHT)
+    print_colored(STOTRAM_INFO["footer"].center(width), Fore.YELLOW, Style.BRIGHT)
+    print_colored(STOTRAM_INFO["attribution"].center(width), Fore.GREEN)
+    print_colored("=" * width, Fore.CYAN, Style.BRIGHT)
+
+def print_verse(verse_num, verse_text):
+    """Print a single verse with formatting"""
+    print_colored(f"॥{verse_num}॥", Fore.CYAN, Style.BRIGHT, end=' ')
+    print_colored(verse_text, Fore.YELLOW)
+    print()
+
+def display_all_verses():
+    """Display all verses continuously"""
+    print_header()
+    for verse in SHIV_TANDAV_VERSES:
+        print_verse(verse["number"], verse["sanskrit"])
+        time.sleep(0.5)  # Small delay between verses for readability
+    print_footer()
+
+def display_verse_by_verse():
+    """Display verses one by one with user interaction"""
+    print_header()
+    print_colored("Press ENTER for next verse, 'q' to quit, 'p' for previous", Fore.GREEN)
+    print_colored("-" * 60, Fore.CYAN)
+    
+    current_verse = 0
+    while 0 <= current_verse < len(SHIV_TANDAV_VERSES):
+        verse = SHIV_TANDAV_VERSES[current_verse]
+        print_colored(f"\nVerse {current_verse + 1}/{len(SHIV_TANDAV_VERSES)}", Fore.CYAN, Style.BRIGHT)
+        print_verse(verse["number"], verse["sanskrit"])
+        
+        user_input = input("\n[Enter/n/p/q]: ").strip().lower()
+        
+        if user_input == 'q':
+            break
+        elif user_input == 'p':
+            current_verse = max(0, current_verse - 1)
+        else:
+            current_verse += 1
+    
+    print_footer()
+
+def display_random_verse():
+    """Display a random verse"""
+    import random
+    verse = random.choice(SHIV_TANDAV_VERSES)
+    print_header()
+    print_colored(f"Random Verse {verse['number']}/{len(SHIV_TANDAV_VERSES)}", Fore.CYAN, Style.BRIGHT)
+    print_verse(verse["number"], verse["sanskrit"])
+    print_footer()
+
+def search_verses(search_term):
+    """Search for a term in verses"""
+    print_header()
+    print_colored(f"Search results for: '{search_term}'", Fore.CYAN, Style.BRIGHT)
+    print_colored("-" * 60, Fore.CYAN)
+    
+    found = False
+    for i, verse in enumerate(SHIV_TANDAV_VERSES, 1):
+        if search_term.lower() in verse["sanskrit"].lower():
+            print_colored(f"\nVerse {i}:", Fore.GREEN, Style.BRIGHT)
+            print_verse(verse["number"], verse["sanskrit"])
+            found = True
+    
+    if not found:
+        print_colored("No verses found containing the search term.", Fore.RED)
+    
+    print_footer()
+
+def export_to_file(filename="shiv_tandav_stotram.txt"):
+    """Export the stotram to a text file"""
+    try:
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write("=" * 80 + "\n")
+            f.write(STOTRAM_INFO["title"].center(80) + "\n")
+            f.write(STOTRAM_INFO["subtitle"].center(80) + "\n")
+            f.write("=" * 80 + "\n\n")
+            
+            for i, verse in enumerate(SHIV_TANDAV_VERSES, 1):
+                f.write(f"॥{verse['number']}॥ ")
+                f.write(verse["sanskrit"] + "\n\n")
+            
+            f.write("=" * 80 + "\n")
+            f.write(STOTRAM_INFO["footer"].center(80) + "\n")
+            f.write(STOTRAM_INFO["attribution"].center(80) + "\n")
+            f.write("=" * 80 + "\n")
+        
+        print_colored(f"✓ Stotram exported to {filename}", Fore.GREEN, Style.BRIGHT)
+        return True
+    except Exception as e:
+        print_colored(f"✗ Error exporting: {e}", Fore.RED)
+        return False
+
+def show_stats():
+    """Display statistics about the stotram"""
+    total_verses = len(SHIV_TANDAV_VERSES)
+    total_chars = sum(len(v["sanskrit"]) for v in SHIV_TANDAV_VERSES)
+    
+    print_header()
+    print_colored("STOTRAM STATISTICS", Fore.CYAN, Style.BRIGHT)
+    print_colored("-" * 40, Fore.CYAN)
+    print_colored(f"Total Verses: {total_verses}", Fore.YELLOW)
+    print_colored(f"Total Characters: {total_chars:,}", Fore.YELLOW)
+    print_colored(f"Average Verse Length: {total_chars // total_verses} chars", Fore.YELLOW)
+    print_colored(f"Composer: Ravana (दशवक्त्र)", Fore.YELLOW)
+    print_colored(f"Deity: Lord Shiva (शिव)", Fore.YELLOW)
+    print_colored(f"Language: Sanskrit (संस्कृत)", Fore.YELLOW)
+    print_footer()
+
+def main_menu():
+    """Display main menu and handle user choice"""
+    while True:
+        clear_screen()
+        print_colored("=" * 60, Fore.CYAN, Style.BRIGHT)
+        print_colored("शिवताण्डवस्तोत्रम्".center(60), Fore.YELLOW, Style.BRIGHT)
+        print_colored("Shiv Tandav Stotram - Python Edition".center(60), Fore.GREEN)
+        print_colored("=" * 60, Fore.CYAN, Style.BRIGHT)
+        print()
+        print_colored("1. Display all verses", Fore.WHITE)
+        print_colored("2. Read verse by verse (interactive)", Fore.WHITE)
+        print_colored("3. Show random verse", Fore.WHITE)
+        print_colored("4. Search in verses", Fore.WHITE)
+        print_colored("5. Export to text file", Fore.WHITE)
+        print_colored("6. Show statistics", Fore.WHITE)
+        print_colored("7. About", Fore.WHITE)
+        print_colored("8. Exit", Fore.WHITE)
+        print()
+        
+        choice = input("Enter your choice (1-8): ").strip()
+        
+        if choice == '1':
+            clear_screen()
+            display_all_verses()
+            input("\nPress Enter to continue...")
+        elif choice == '2':
+            clear_screen()
+            display_verse_by_verse()
+            input("\nPress Enter to continue...")
+        elif choice == '3':
+            clear_screen()
+            display_random_verse()
+            input("\nPress Enter to continue...")
+        elif choice == '4':
+            clear_screen()
+            search_term = input("Enter search term: ").strip()
+            clear_screen()
+            search_verses(search_term)
+            input("\nPress Enter to continue...")
+        elif choice == '5':
+            clear_screen()
+            filename = input("Enter filename (default: shiv_tandav_stotram.txt): ").strip()
+            if not filename:
+                filename = "shiv_tandav_stotram.txt"
+            export_to_file(filename)
+            input("\nPress Enter to continue...")
+        elif choice == '6':
+            clear_screen()
+            show_stats()
+            input("\nPress Enter to continue...")
+        elif choice == '7':
+            clear_screen()
+            print_header()
+            print_colored(STOTRAM_INFO["description"], Fore.WHITE)
+            print_colored("\nThis hymn describes the cosmic dance (Tandava) of Lord Shiva", Fore.WHITE)
+            print_colored("and is traditionally attributed to Ravana, the great devotee", Fore.WHITE)
+            print_colored("of Shiva and king of Lanka.", Fore.WHITE)
+            print_footer()
+            input("\nPress Enter to continue...")
+        elif choice == '8':
+            print_colored("\nॐ नमः शिवाय", Fore.YELLOW, Style.BRIGHT)
+            print_colored("Thank you for using Shiv Tandav Stotram. Har Har Mahadev! 🙏", Fore.GREEN)
+            break
+        else:
+            print_colored("Invalid choice! Please try again.", Fore.RED)
+            time.sleep(1)
+
+def main():
+    """Main function"""
+    # Check if terminal supports Unicode
+    if not supports_unicode():
+        print("Warning: Your terminal may not display Devanagari script correctly.")
+        print("For best experience, use a Unicode-compatible terminal.")
+        time.sleep(2)
+    
+    # Clear screen and show welcome message
+    clear_screen()
+    print_colored("🕉️  ॐ नमः शिवाय  🕉️", Fore.YELLOW, Style.BRIGHT)
+    print_colored("Loading Shiv Tandav Stotram...", Fore.CYAN)
+    time.sleep(1)
+    
+    # Start main menu
+    main_menu()
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print_colored("\n\n🙏 ॐ नमः शिवाय 🙏", Fore.YELLOW, Style.BRIGHT)
+        print_colored("Program terminated by user. Har Har Mahadev!", Fore.GREEN)
+        sys.exit(0)
+    except Exception as e:
+        print_colored(f"\nAn error occurred: {e}", Fore.RED)
+        sys.exit(1)
