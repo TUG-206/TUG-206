@@ -1,0 +1,1639 @@
+@@ -0,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N.O.V.A v6 — Total Access Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   N.O.V.A v6.0 — TOTAL ACCESS PERSONAL AI AGENT
+   DEEP SPACE + ELECTRIC CYAN — Maximum Power
+   ═══════════════════════════════════════════════════ */
+:root{
+  --bg0:#020408;--bg1:#040a10;--bg2:#061218;--bg3:#091822;
+  --panel:rgba(6,18,24,0.92);
+  --c1:#00e5ff;--c1d:rgba(0,229,255,0.15);--c1l:rgba(0,229,255,0.35);
+  --c2:#ff6b00;--c2d:rgba(255,107,0,0.15);--c2l:rgba(255,107,0,0.35);
+  --c3:#39ff85;--c3d:rgba(57,255,133,0.12);
+  --red:#ff3355;--redd:rgba(255,51,85,0.15);
+  --text:#c8dde8;--textd:#3a5566;--textm:#7a9aaa;
+  --bdr:rgba(0,229,255,0.1);
+  --r:6px;
+  --g1:0 0 12px rgba(0,229,255,0.4),0 0 28px rgba(0,229,255,0.15);
+  --g2:0 0 12px rgba(255,107,0,0.4),0 0 28px rgba(255,107,0,0.15);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);color:var(--text);font-family:'Rajdhani',sans-serif;user-select:none}
+
+/* BG effects */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 0%,rgba(0,229,255,0.04) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 70% at 90% 100%,rgba(255,107,0,0.03) 0%,transparent 50%),
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,229,255,0.025) 39px,rgba(0,229,255,0.025) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(0,229,255,0.015) 59px,rgba(0,229,255,0.015) 60px)}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 120% 120% at 50% 50%,transparent 30%,rgba(2,4,8,0.75) 100%)}
+#scanline{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 3px)}
+
+/* ─── LAYOUT ─── */
+#app{position:relative;z-index:2;width:100vw;height:100vh;display:grid;
+  grid-template-rows:52px 1fr 32px;
+  grid-template-columns:240px 1fr 300px}
+
+/* ─── HEADER ─── */
+#hdr{grid-column:1/-1;background:rgba(2,4,8,0.97);border-bottom:1px solid var(--c1l);
+  display:flex;align-items:center;padding:0 16px;gap:10px;position:relative;backdrop-filter:blur(20px)}
+#hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--c1) 20%,var(--c2) 80%,transparent);opacity:0.6}
+
+.logo{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;letter-spacing:5px;
+  color:var(--c1);text-shadow:var(--g1);flex-shrink:0;animation:flicker 8s infinite}
+.logo span{color:var(--c2)}
+@keyframes flicker{0%,94%,100%{opacity:1}95%{opacity:.6}97%{opacity:.9}98%{opacity:.5}99%{opacity:1}}
+
+.hpills{display:flex;gap:4px;flex:1;overflow:hidden;flex-wrap:wrap}
+.hp{display:flex;align-items:center;gap:3px;padding:2px 8px;border-radius:2px;
+  border:1px solid var(--bdr);background:rgba(0,229,255,0.03);
+  font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--textd);
+  cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:.5px}
+.hp:hover{border-color:var(--c1l);color:var(--c1);background:var(--c1d)}
+.hp .d{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
+.hp.on{border-color:rgba(57,255,133,.4);color:var(--c3);background:var(--c3d)}
+.hp.on .d{animation:pd 1.5s infinite}
+.hp.err{border-color:rgba(255,51,85,.4);color:var(--red);background:var(--redd)}
+@keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.6)}}
+
+.hright{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
+#vcbar{display:none;align-items:center;gap:4px;font-family:'Share Tech Mono',monospace;
+  font-size:8px;color:var(--c3);letter-spacing:1px}
+#vcbar.show{display:flex}
+#vcbar .d{width:4px;height:4px;border-radius:50%;background:var(--red);animation:pd .5s infinite}
+.kpill{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--textd);
+  border:1px solid var(--bdr);padding:3px 9px;border-radius:2px;cursor:pointer;
+  transition:all .2s;letter-spacing:1px}
+.kpill:hover{border-color:var(--c1);color:var(--c1);background:var(--c1d)}
+.kpill.ok{border-color:rgba(57,255,133,.4);color:var(--c3)}
+#clk{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--textm);letter-spacing:2px}
+
+/* ─── LEFT PANEL ─── */
+#left{border-right:1px solid var(--bdr);background:rgba(4,10,16,.75);
+  backdrop-filter:blur(14px);display:flex;flex-direction:column;overflow:hidden}
+
+.sh{padding:8px 12px 6px;font-family:'Share Tech Mono',monospace;font-size:7px;
+  letter-spacing:3px;color:var(--textd);text-transform:uppercase;
+  border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:5px;flex-shrink:0}
+.sh::before{content:'';width:2px;height:7px;background:var(--c1);
+  box-shadow:0 0 6px var(--c1);border-radius:1px}
+
+/* App launcher grid */
+.app-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:8px;flex-shrink:0}
+.ag{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:8px 4px;border-radius:var(--r);border:1px solid var(--bdr);
+  background:rgba(0,229,255,0.02);cursor:pointer;transition:all .22s;
+  font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--textd);
+  text-align:center;letter-spacing:.3px}
+.ag:hover{border-color:var(--c1l);color:var(--c1);background:var(--c1d);
+  transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.4),0 0 10px rgba(0,229,255,.06)}
+.ag.lit{border-color:rgba(57,255,133,.35);color:var(--c3);background:var(--c3d)}
+.ag.warn{border-color:rgba(255,107,0,.4);color:var(--c2);background:var(--c2d)}
+.agi{font-size:18px;line-height:1}
+
+/* System controls */
+.sctl{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:6px 8px;flex-shrink:0}
+.sc{padding:6px 4px;border-radius:var(--r);border:1px solid var(--bdr);
+  background:rgba(0,229,255,.02);cursor:pointer;transition:all .2s;text-align:center;
+  font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--textd);letter-spacing:.5px}
+.sc:hover{border-color:var(--c1l);color:var(--c1);background:var(--c1d)}
+.sc.danger{border-color:rgba(255,51,85,.2)}
+.sc.danger:hover{border-color:rgba(255,51,85,.6);color:var(--red);background:var(--redd)}
+
+/* Permissions */
+.prm-list{padding:6px 8px;flex-shrink:0}
+.prm{display:flex;align-items:center;justify-content:space-between;
+  padding:3px 7px;border-radius:3px;background:rgba(0,0,0,.2);margin-bottom:2px}
+.prm-k{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--textm)}
+.prm-v{font-family:'Share Tech Mono',monospace;font-size:7px;padding:1px 5px;
+  border-radius:2px;letter-spacing:.5px}
+.prm-v.ok{background:rgba(57,255,133,.1);color:var(--c3);border:1px solid rgba(57,255,133,.2)}
+.prm-v.no{background:rgba(255,51,85,.1);color:var(--red);border:1px solid rgba(255,51,85,.2)}
+.prm-v.ask{background:rgba(0,229,255,.08);color:var(--c1);border:1px solid rgba(0,229,255,.2)}
+
+/* History */
+.hist{flex:1;overflow-y:auto;padding:6px}
+.hist::-webkit-scrollbar{width:2px}
+.hist::-webkit-scrollbar-thumb{background:var(--bdr)}
+.hi{padding:5px 8px;border-radius:3px;font-size:10px;color:var(--textd);
+  cursor:pointer;border:1px solid transparent;transition:all .15s;
+  overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.hi:hover{background:rgba(0,229,255,.04);border-color:var(--bdr);color:var(--textm)}
+.hi.cur{border-color:rgba(0,229,255,.25);color:var(--c1);background:var(--c1d)}
+
+/* ─── MAIN ─── */
+#main{display:flex;flex-direction:column;overflow:hidden;position:relative}
+
+/* Tab bar */
+#tabs{display:flex;gap:2px;padding:5px 14px 0;background:rgba(2,4,8,.6);
+  border-bottom:1px solid var(--bdr);flex-shrink:0}
+.tab{padding:5px 14px;border-radius:5px 5px 0 0;border:1px solid transparent;
+  border-bottom:none;font-family:'Share Tech Mono',monospace;font-size:9px;
+  color:var(--textd);cursor:pointer;transition:all .2s;letter-spacing:.5px;
+  display:flex;align-items:center;gap:5px}
+.tab:hover{color:var(--textm);background:rgba(0,229,255,.04)}
+.tab.active{border-color:var(--c1l);background:var(--bg2);color:var(--c1);
+  border-bottom:1px solid var(--bg2)}
+.tab .tc{font-size:12px}
+
+/* Tab panes */
+.pane{display:none;flex:1;overflow:hidden;flex-direction:column}
+.pane.active{display:flex}
+
+/* Chat pane */
+#msgs{flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+#msgs::-webkit-scrollbar{width:2px}
+#msgs::-webkit-scrollbar-thumb{background:rgba(0,229,255,.15);border-radius:1px}
+
+/* Welcome */
+#welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;height:100%;animation:fu .8s ease}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.wring{width:100px;height:100px;position:relative;display:flex;align-items:center;justify-content:center}
+.wring::before,.wring::after{content:'';position:absolute;border-radius:50%}
+.wring::before{inset:0;border:1px solid var(--c1l);animation:spin 10s linear infinite}
+.wring::after{inset:10px;border:1px dashed rgba(0,229,255,.12);animation:spin 7s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wcore{width:68px;height:68px;border-radius:50%;border:1px solid rgba(0,229,255,.45);
+  background:radial-gradient(circle,rgba(0,229,255,.12),transparent 70%);
+  box-shadow:var(--g1);display:flex;align-items:center;justify-content:center;font-size:26px;
+  animation:cp 3s ease-in-out infinite}
+@keyframes cp{0%,100%{box-shadow:var(--g1)}50%{box-shadow:0 0 28px rgba(0,229,255,.65),0 0 60px rgba(0,229,255,.2)}}
+.wname{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;
+  letter-spacing:8px;color:var(--c1);text-shadow:var(--g1)}
+.wtag{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--textd);
+  letter-spacing:2px;text-align:center;line-height:2}
+.qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;max-width:650px}
+.qc{padding:10px;border-radius:var(--r);border:1px solid var(--bdr);
+  background:rgba(0,229,255,.02);cursor:pointer;transition:all .22s;
+  font-size:10px;color:var(--textm);line-height:1.5;backdrop-filter:blur(6px)}
+.qc:hover{border-color:var(--c1l);color:var(--text);background:var(--c1d);
+  transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.5),0 0 18px rgba(0,229,255,.06)}
+.qi{font-size:18px;display:block;margin-bottom:4px}
+.ql{display:block;font-weight:600;color:var(--c1);margin-bottom:2px;font-size:10px}
+
+/* Messages */
+.mrow{display:flex;gap:9px;animation:mi .24s ease;max-width:800px}
+@keyframes mi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.mrow.u{flex-direction:row-reverse;align-self:flex-end}
+.mav{width:28px;height:28px;border-radius:5px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',monospace;font-size:7px;font-weight:700}
+.mrow.ai .mav{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--c1)}
+.mrow.u  .mav{background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.3);color:var(--c2)}
+.mrow.sys .mav{background:rgba(57,255,133,.07);border:1px solid rgba(57,255,133,.2);color:var(--c3);font-size:13px}
+.mbody{flex:1}
+.mmeta{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--textd);
+  margin-bottom:3px;display:flex;align-items:center;gap:5px}
+.mrow.u .mmeta{flex-direction:row-reverse}
+.mb{padding:10px 14px;border-radius:var(--r);border:1px solid var(--bdr);
+  font-size:13px;line-height:1.75;backdrop-filter:blur(6px)}
+.mrow.ai .mb{background:var(--panel);border-color:var(--bdr)}
+.mrow.u  .mb{background:rgba(255,107,0,.06);border-color:rgba(255,107,0,.2)}
+.mrow.sys .mb{background:rgba(57,255,133,.03);border-color:rgba(57,255,133,.15);
+  font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--c3);line-height:1.9}
+.mb pre{background:rgba(0,0,0,.55);border:1px solid rgba(0,229,255,.12);
+  border-radius:4px;padding:9px 12px;margin:7px 0;font-family:'Share Tech Mono',monospace;
+  font-size:9px;color:var(--c1);line-height:1.7;overflow-x:auto}
+.mb code{background:rgba(0,0,0,.4);border:1px solid rgba(0,229,255,.1);
+  border-radius:3px;padding:1px 4px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--c1)}
+.mb pre code{background:none;border:none;padding:0}
+.mb strong{color:var(--c2);font-weight:600}
+.mb em{color:var(--c1);font-style:italic}
+.typing{display:flex;gap:4px;padding:2px 0;align-items:center}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--c1);
+  animation:bd 1.2s infinite ease-in-out}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bd{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-5px);opacity:1}}
+
+/* Browser pane */
+#browser-pane{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#url-bar{display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid var(--bdr);
+  background:rgba(2,4,8,.8);align-items:center;flex-shrink:0}
+#url-inp{flex:1;background:rgba(0,0,0,.4);border:1px solid var(--bdr);
+  border-radius:4px;color:var(--text);padding:5px 10px;
+  font-family:'Share Tech Mono',monospace;font-size:10px;outline:none;transition:border-color .2s}
+#url-inp:focus{border-color:var(--c1l)}
+.ub-btn{padding:5px 10px;border-radius:4px;border:1px solid var(--bdr);
+  background:rgba(0,229,255,.04);cursor:pointer;font-family:'Share Tech Mono',monospace;
+  font-size:8px;color:var(--textd);transition:all .2s;letter-spacing:.5px;white-space:nowrap}
+.ub-btn:hover{border-color:var(--c1l);color:var(--c1);background:var(--c1d)}
+.quicklinks{display:flex;gap:5px;padding:6px 12px;border-bottom:1px solid var(--bdr);
+  background:rgba(2,4,8,.6);flex-shrink:0;flex-wrap:wrap}
+.ql-link{padding:3px 10px;border-radius:3px;border:1px solid var(--bdr);
+  font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--textd);
+  cursor:pointer;transition:all .15s;white-space:nowrap}
+.ql-link:hover{border-color:var(--c1l);color:var(--c1);background:var(--c1d)}
+#webview-wrap{flex:1;position:relative;background:var(--bg1)}
+#webview{width:100%;height:100%;border:none;display:block;border-radius:0}
+#webview-placeholder{width:100%;height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px}
+.wv-icon{font-size:48px;opacity:.3}
+.wv-txt{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--textd);
+  text-align:center;line-height:1.8;letter-spacing:1px}
+
+/* Input zone */
+#input-zone{padding:10px 16px 12px;border-top:1px solid var(--bdr);
+  background:rgba(2,4,8,.85);backdrop-filter:blur(18px);flex-shrink:0}
+.arow{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}
+.achip{display:flex;align-items:center;gap:3px;background:rgba(0,229,255,.07);
+  border:1px solid rgba(0,229,255,.2);border-radius:2px;padding:2px 7px;
+  font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--textm)}
+.achip button{background:none;border:none;color:var(--textd);cursor:pointer;font-size:10px}
+.achip button:hover{color:var(--red)}
+.irow{display:flex;gap:6px;align-items:flex-end;background:rgba(0,0,0,.35);
+  border:1px solid var(--bdr);border-radius:var(--r);padding:8px 10px;
+  transition:border-color .2s,box-shadow .2s}
+.irow:focus-within{border-color:rgba(0,229,255,.3);box-shadow:0 0 0 1px rgba(0,229,255,.07)}
+#inp{flex:1;background:none;border:none;outline:none;color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:13px;resize:none;max-height:110px;line-height:1.6}
+#inp::placeholder{color:var(--textd)}
+.ibtns{display:flex;align-items:flex-end;gap:4px;flex-shrink:0}
+.ib{width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+  border-radius:4px;border:1px solid var(--bdr);background:rgba(0,229,255,.03);
+  cursor:pointer;font-size:13px;color:var(--textd);transition:all .18s}
+.ib:hover{border-color:var(--c1l);color:var(--c1);background:var(--c1d)}
+.ib.rec{border-color:rgba(255,51,85,.4);color:var(--red);animation:rg 1s infinite}
+@keyframes rg{0%,100%{box-shadow:none}50%{box-shadow:0 0 10px rgba(255,51,85,.5)}}
+.sbtn{height:30px;padding:0 16px;border-radius:4px;
+  background:linear-gradient(135deg,var(--c1),#0099bb);border:none;color:var(--bg0);
+  font-family:'Orbitron',monospace;font-size:9px;font-weight:700;letter-spacing:2px;
+  cursor:pointer;transition:all .18s}
+.sbtn:hover{background:linear-gradient(135deg,#33eeff,var(--c1));box-shadow:var(--g1);transform:translateY(-1px)}
+.sbtn:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+.ifoot{display:flex;justify-content:space-between;margin-top:4px;
+  font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--textd)}
+
+/* ─── RIGHT PANEL ─── */
+#right{border-left:1px solid var(--bdr);background:rgba(4,10,16,.75);
+  backdrop-filter:blur(14px);display:flex;flex-direction:column;overflow:hidden}
+
+/* Camera */
+.cam-sec{padding:8px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.cam-vp{position:relative;border-radius:var(--r);overflow:hidden;
+  border:1px solid var(--bdr);background:var(--bg0)}
+#camvid{width:100%;display:none;max-height:165px;object-fit:cover;border-radius:var(--r)}
+.cam-off{width:100%;height:140px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:7px;cursor:pointer}
+.cam-off:hover .cring{border-color:var(--c1l)}
+.cring{width:52px;height:52px;border-radius:50%;border:1px dashed rgba(0,229,255,.22);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  transition:border-color .3s}
+.cam-off p{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--textd);letter-spacing:2px}
+.cam-ov{position:absolute;inset:0;pointer-events:none;display:none}
+.cam-ov.show{display:block}
+.cam-ov::before{content:'';position:absolute;top:5px;left:5px;width:14px;height:14px;
+  border-top:2px solid var(--c1);border-left:2px solid var(--c1);box-shadow:var(--g1)}
+.cam-ov::after{content:'';position:absolute;bottom:5px;right:5px;width:14px;height:14px;
+  border-bottom:2px solid var(--c1);border-right:2px solid var(--c1);box-shadow:var(--g1)}
+.camsl{position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--c1),transparent);
+  opacity:.4;animation:sc 3s ease-in-out infinite;display:none}
+.camsl.show{display:block}
+@keyframes sc{0%{top:0;opacity:0}10%{opacity:.4}90%{opacity:.4}100%{top:100%;opacity:0}}
+.cmbadge{position:absolute;top:5px;right:5px;display:none;align-items:center;gap:3px;
+  background:rgba(0,0,0,.75);border:1px solid var(--bdr);border-radius:2px;
+  padding:1px 6px;font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--c3)}
+.cmbadge.show{display:flex}
+.cmbadge .d{width:4px;height:4px;border-radius:50%;background:var(--red);animation:pd 1s infinite}
+.cam-btns{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:5px}
+.cb{padding:5px;border-radius:4px;border:1px solid var(--bdr);background:rgba(0,229,255,.03);
+  cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:7px;
+  color:var(--textd);letter-spacing:.5px;transition:all .18s;text-align:center}
+.cb:hover{border-color:var(--c1l);color:var(--c1);background:var(--c1d)}
+.cb.fw{grid-column:1/-1}
+#cvs{display:none}
+.sflash{position:absolute;inset:0;background:rgba(255,255,255,.85);
+  border-radius:var(--r);pointer-events:none;opacity:0;transition:opacity .05s}
+.sflash.go{opacity:1;transition:none}
+
+/* Metrics */
+.met{padding:7px 9px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.mr{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.mk{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--textd);letter-spacing:.5px}
+.mv{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--textm)}
+.bbar{height:2px;background:var(--bdr);border-radius:1px;overflow:hidden;margin-bottom:4px}
+.bfill{height:100%;border-radius:1px;background:linear-gradient(90deg,var(--c3),var(--c1));transition:width .5s}
+
+/* Terminal */
+.th{padding:6px 9px;font-family:'Share Tech Mono',monospace;font-size:7px;
+  color:var(--textd);letter-spacing:2px;border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;gap:4px;flex-shrink:0}
+.th::before{content:'›';color:var(--c1);font-size:11px}
+#term{flex:1;overflow-y:auto;padding:6px 9px;font-family:'Share Tech Mono',monospace;
+  font-size:8px;line-height:1.8;background:rgba(0,0,0,.2)}
+#term::-webkit-scrollbar{width:2px}
+#term::-webkit-scrollbar-thumb{background:rgba(0,229,255,.12)}
+.tl{margin-bottom:1px}
+.tl.i{color:var(--c1)}.tl.s{color:var(--c3)}.tl.w{color:#ffcc00}
+.tl.e{color:var(--red)}.tl.d{color:var(--textd)}
+
+/* ─── FOOTER ─── */
+#ftr{grid-column:1/-1;background:rgba(0,229,255,.04);border-top:1px solid rgba(0,229,255,.15);
+  display:flex;align-items:center;padding:0 14px;gap:12px;
+  font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--c1);letter-spacing:.5px}
+.fs{color:rgba(0,229,255,.2)}
+#fsts{margin-left:auto}
+#fsts.busy{color:var(--c3);animation:pd .7s infinite}
+
+/* ─── MODALS ─── */
+.mveil{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.85);
+  backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center}
+.mveil.open{display:flex}
+.mbox{background:rgba(4,10,16,.98);border:1px solid rgba(0,229,255,.35);
+  border-radius:var(--r);padding:24px;max-width:420px;width:92%;
+  box-shadow:var(--g1),0 20px 60px rgba(0,0,0,.8);animation:mpop .22s ease}
+@keyframes mpop{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+.mbox h3{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;
+  letter-spacing:4px;color:var(--c1);text-shadow:var(--g1);margin-bottom:9px}
+.mbox p{font-size:12px;color:var(--textm);line-height:1.7;margin-bottom:12px}
+.minp{width:100%;background:rgba(0,0,0,.45);border:1px solid var(--bdr);border-radius:4px;
+  color:var(--text);padding:8px 11px;font-family:'Share Tech Mono',monospace;font-size:10px;
+  outline:none;margin-bottom:10px;transition:border-color .2s}
+.minp:focus{border-color:rgba(0,229,255,.35)}
+.merr{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--red);
+  margin-bottom:8px;display:none}
+.macts{display:flex;gap:7px;justify-content:flex-end}
+.mbtn{padding:6px 16px;border-radius:4px;font-family:'Orbitron',monospace;
+  font-size:9px;font-weight:700;letter-spacing:2px;cursor:pointer;border:none;transition:all .18s}
+.mbtn.pri{background:linear-gradient(135deg,var(--c1),#0099bb);color:var(--bg0)}
+.mbtn.pri:hover{box-shadow:var(--g1);transform:translateY(-1px)}
+.mbtn.sec{background:rgba(255,255,255,.04);border:1px solid var(--bdr);color:var(--textm)}
+.mbtn.sec:hover{border-color:var(--c1l);color:var(--c1)}
+.mbtn.danger{background:linear-gradient(135deg,var(--red),#cc0022);color:#fff}
+.mbtn.danger:hover{box-shadow:var(--g2);transform:translateY(-1px)}
+
+/* ─── VOICE HUD ─── */
+#vhud{position:fixed;inset:0;z-index:600;display:none;align-items:center;
+  justify-content:center;flex-direction:column;gap:18px;
+  background:rgba(2,4,8,.9);backdrop-filter:blur(12px);animation:fu .22s ease}
+#vhud.open{display:flex}
+.vhring-wrap{position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center}
+.vhr{position:absolute;border-radius:50%;border:1px solid var(--c1);opacity:0}
+.vhr.r1{inset:0;animation:re 2s ease-out infinite 0s}
+.vhr.r2{inset:12px;animation:re 2s ease-out infinite .5s}
+.vhr.r3{inset:24px;animation:re 2s ease-out infinite 1s}
+@keyframes re{0%{transform:scale(.8);opacity:.7}100%{transform:scale(1.5);opacity:0}}
+.vhcore{width:90px;height:90px;border-radius:50%;border:2px solid var(--c1);
+  background:radial-gradient(circle,rgba(0,229,255,.16),rgba(2,4,8,.95) 70%);
+  box-shadow:var(--g1);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;cursor:pointer;z-index:1;transition:all .2s}
+.vhcore:hover{box-shadow:0 0 35px rgba(0,229,255,.65),0 0 70px rgba(0,229,255,.2)}
+.vhmic{font-size:28px;line-height:1}
+.vhlbl{font-family:'Share Tech Mono',monospace;font-size:6px;color:var(--c1);letter-spacing:2px}
+#vhwave{display:flex;align-items:center;gap:2px;height:36px}
+.wb{width:3px;border-radius:2px;background:var(--c1);
+  box-shadow:0 0 5px rgba(0,229,255,.4);transition:height .08s ease;min-height:3px}
+.vhmode{font-family:'Orbitron',monospace;font-size:9px;color:var(--c1);
+  letter-spacing:4px;text-shadow:var(--g1)}
+#vhtxt{font-family:'Rajdhani',sans-serif;font-size:15px;color:var(--text);
+  text-align:center;max-width:520px;min-height:26px;padding:0 20px}
+#vhint{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--c1);
+  opacity:.6;text-align:center;min-height:16px}
+#vhflash{font-family:'Orbitron',monospace;font-size:12px;color:var(--c3);
+  letter-spacing:3px;min-height:20px;text-align:center;text-shadow:var(--g1)}
+.vhbtns{display:flex;gap:8px}
+.vhb{padding:5px 14px;border-radius:3px;font-family:'Share Tech Mono',monospace;
+  font-size:8px;letter-spacing:1px;cursor:pointer;border:1px solid var(--bdr);
+  color:var(--textd);background:rgba(0,229,255,.03);transition:all .18s}
+.vhb:hover{border-color:var(--c1l);color:var(--c1);background:var(--c1d)}
+.vhb.x{border-color:rgba(255,51,85,.3);color:var(--red)}
+.vhb.x:hover{background:var(--redd)}
+
+/* ─── SYSTEM MODAL ─── */
+#sys-modal .mbox{border-color:rgba(255,51,85,.5)}
+#sys-modal h3{color:var(--red);text-shadow:0 0 12px rgba(255,51,85,.4),0 0 30px rgba(255,51,85,.15)}
+#sys-modal .mbox{background:rgba(10,2,4,.98)}
+</style>
+</head>
+<body>
+<div id="scanline"></div>
+
+<div id="app">
+
+<!-- ══════ HEADER ══════ -->
+<header id="hdr">
+  <div class="logo">N<span>·</span>O<span>·</span>V<span>·</span>A</div>
+  <div class="hpills">
+    <div class="hp" id="hp-net"  onclick="doNetwork()"><div class="d"></div>NETWORK</div>
+    <div class="hp" id="hp-cam"  onclick="toggleCam()"><div class="d"></div>CAMERA</div>
+    <div class="hp" id="hp-mic"  onclick="openVHUD()"><div class="d"></div>VOICE</div>
+    <div class="hp" id="hp-gps"  onclick="doGPS()"><div class="d"></div>GPS</div>
+    <div class="hp" id="hp-clip" onclick="doClipboard()"><div class="d"></div>CLIPBOARD</div>
+    <div class="hp" id="hp-ntf"  onclick="doNotify()"><div class="d"></div>ALERTS</div>
+    <div class="hp" id="hp-tts"  onclick="toggleTTS()"><div class="d"></div>SPEECH</div>
+    <div class="hp" id="hp-wake" onclick="toggleWake()"><div class="d"></div>WAKE·WORD</div>
+    <div class="hp" id="hp-cont" onclick="toggleCont()"><div class="d"></div>ALWAYS·ON</div>
+  </div>
+  <div id="vcbar"><div class="d"></div><span id="vctxt">LISTENING</span></div>
+  <div class="hright">
+    <div class="kpill" id="kbtn" onclick="openKeyModal()">⚙ API KEY</div>
+    <div id="clk">00:00:00</div>
+  </div>
+</header>
+
+<!-- ══════ LEFT ══════ -->
+<aside id="left">
+  <div class="sh">APPLICATIONS</div>
+  <div class="app-grid">
+    <div class="ag" onclick="openApp('https://www.youtube.com','📺','YouTube')"><div class="agi">📺</div>YOUTUBE</div>
+    <div class="ag" onclick="openApp('https://www.google.com','🔍','Google')"><div class="agi">🔍</div>GOOGLE</div>
+    <div class="ag" onclick="openApp('https://mail.google.com','📧','Gmail')"><div class="agi">📧</div>GMAIL</div>
+    <div class="ag" onclick="openApp('https://www.google.com/maps','🗺','Maps')"><div class="agi">🗺</div>MAPS</div>
+    <div class="ag" onclick="openApp('https://drive.google.com','☁','Drive')"><div class="agi">☁</div>DRIVE</div>
+    <div class="ag" onclick="openApp('https://calendar.google.com','📅','Calendar')"><div class="agi">📅</div>CALENDAR</div>
+    <div class="ag" onclick="openApp('https://translate.google.com','🌐','Translate')"><div class="agi">🌐</div>TRANSLATE</div>
+    <div class="ag" onclick="openApp('https://news.google.com','📰','News')"><div class="agi">📰</div>NEWS</div>
+    <div class="ag" onclick="openApp('https://weather.com','🌤','Weather')"><div class="agi">🌤</div>WEATHER</div>
+    <div class="ag" onclick="openApp('https://www.wikipedia.org','📚','Wikipedia')"><div class="agi">📚</div>WIKI</div>
+    <div class="ag" onclick="openApp('https://github.com','🐱','GitHub')"><div class="agi">🐱</div>GITHUB</div>
+    <div class="ag" onclick="openApp('https://chatgpt.com','💬','ChatGPT')"><div class="agi">💬</div>CHATGPT</div>
+  </div>
+
+  <div class="sh">SYSTEM CONTROLS</div>
+  <div class="sctl">
+    <div class="sc" onclick="doSnap()">📸 SNAPSHOT</div>
+    <div class="sc" onclick="doClipboard()">📋 CLIPBOARD</div>
+    <div class="sc" onclick="openFiles()">📁 FILES</div>
+    <div class="sc" onclick="doGPS()">📍 LOCATION</div>
+    <div class="sc" onclick="doBattery()">🔋 BATTERY</div>
+    <div class="sc" onclick="doNetwork()">🌐 NETWORK</div>
+    <div class="sc" onclick="doStorage()">💾 STORAGE</div>
+    <div class="sc" onclick="doDateTime()">🕐 TIME</div>
+    <div class="sc" onclick="doScreen()">🖥 DISPLAY</div>
+    <div class="sc" onclick="doDevice()">🧠 DEVICE</div>
+    <div class="sc" onclick="doPaste()">📌 PASTE</div>
+    <div class="sc" onclick="doScreenshot()">🖼 SCREENSHOT</div>
+    <div class="sc danger" onclick="confirmShutdown()">⏻ SHUTDOWN</div>
+    <div class="sc danger" onclick="confirmRestart()">🔄 RESTART</div>
+    <div class="sc danger" onclick="confirmLogout()">🔒 LOCK</div>
+    <div class="sc" onclick="doFullscreen()">⛶ FULLSCREEN</div>
+  </div>
+
+  <div class="sh">PERMISSIONS</div>
+  <div class="prm-list">
+    <div class="prm"><span class="prm-k">CAMERA</span><span class="prm-v ask" id="pt-cam">PENDING</span></div>
+    <div class="prm"><span class="prm-k">MICROPHONE</span><span class="prm-v ask" id="pt-mic">PENDING</span></div>
+    <div class="prm"><span class="prm-k">LOCATION</span><span class="prm-v ask" id="pt-gps">PENDING</span></div>
+    <div class="prm"><span class="prm-k">NOTIFICATIONS</span><span class="prm-v ask" id="pt-ntf">PENDING</span></div>
+    <div class="prm"><span class="prm-k">CLIPBOARD</span><span class="prm-v ask" id="pt-clip">PENDING</span></div>
+    <div class="prm"><span class="prm-k">FILES</span><span class="prm-v ask" id="pt-fs">PENDING</span></div>
+    <div class="prm"><span class="prm-k">SCREEN</span><span class="prm-v ask" id="pt-scr">PENDING</span></div>
+  </div>
+
+  <div class="sh">HISTORY</div>
+  <div class="hist" id="hist"></div>
+</aside>
+
+<!-- ══════ MAIN ══════ -->
+<section id="main">
+  <!-- Tab bar -->
+  <div id="tabs">
+    <div class="tab active" id="tab-chat" onclick="switchTab('chat')"><span class="tc">💬</span>CHAT</div>
+    <div class="tab" id="tab-browser" onclick="switchTab('browser')"><span class="tc">🌐</span>BROWSER</div>
+  </div>
+
+  <!-- CHAT PANE -->
+  <div class="pane active" id="pane-chat">
+    <div id="msgs">
+      <div id="welcome">
+        <div class="wring"><div class="wcore">🤖</div></div>
+        <div class="wname">N·O·V·A</div>
+        <div class="wtag">TOTAL ACCESS PERSONAL AI · v6.0<br>BROWSER · CAMERA · VOICE · GPS · FILES · SYSTEM</div>
+        <div class="qgrid">
+          <div class="qc" onclick="fire('Take a camera snapshot and describe exactly what you see in full detail.')"><span class="qi">👁</span><span class="ql">Camera Vision</span>Live capture & AI analysis</div>
+          <div class="qc" onclick="openApp('https://www.youtube.com','📺','YouTube')"><span class="qi">📺</span><span class="ql">YouTube</span>Open in built-in browser</div>
+          <div class="qc" onclick="fire('Run a complete system diagnostic: battery, CPU, RAM, network, storage, screen.')"><span class="qi">🔬</span><span class="ql">System Scan</span>Full hardware report</div>
+          <div class="qc" onclick="fire('What is my exact GPS location right now? Give coordinates and timezone.')"><span class="qi">📍</span><span class="ql">My Location</span>GPS + timezone</div>
+          <div class="qc" onclick="openVHUD()"><span class="qi">🎙</span><span class="ql">Voice Command</span>Speak to N.O.V.A</div>
+          <div class="qc" onclick="fire('Read my clipboard content and improve or summarize it intelligently.')"><span class="qi">📋</span><span class="ql">Clipboard AI</span>Process copied text</div>
+          <div class="qc" onclick="openFiles()"><span class="qi">📁</span><span class="ql">File Analysis</span>Upload any file</div>
+          <div class="qc" onclick="fire('List every capability you have. What can you access on my laptop right now?')"><span class="qi">⚡</span><span class="ql">Full Briefing</span>Show all powers</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="input-zone">
+      <div class="arow" id="arow"></div>
+      <div class="irow">
+        <textarea id="inp" rows="1" placeholder="Command N.O.V.A — chat, ask, or trigger any tool…"></textarea>
+        <div class="ibtns">
+          <div class="ib" onclick="openFiles()" title="Attach file">📎</div>
+          <div class="ib" id="micbtn" onclick="openVHUD()" title="Voice">🎙</div>
+          <div class="ib" onclick="doSnap()" title="Camera snapshot">📷</div>
+          <button class="sbtn" id="sbtn" onclick="send()">SEND</button>
+        </div>
+      </div>
+      <div class="ifoot">
+        <span>↵ SEND · SHIFT+↵ NEW LINE · 📎 ATTACH · 🎙 VOICE · 📷 CAM</span>
+        <span id="tokinfo">0 TOKENS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BROWSER PANE -->
+  <div class="pane" id="pane-browser">
+    <div id="browser-pane">
+      <div id="url-bar">
+        <div class="ub-btn" onclick="browserNav(-1)">◀</div>
+        <div class="ub-btn" onclick="browserNav(1)">▶</div>
+        <div class="ub-btn" onclick="browserReload()">↺</div>
+        <input id="url-inp" type="url" placeholder="Enter URL or search…" onkeydown="if(event.key==='Enter')browserGo()"/>
+        <div class="ub-btn" onclick="browserGo()">GO</div>
+        <div class="ub-btn" onclick="browserAsk()">🤖 ASK</div>
+        <div class="ub-btn" onclick="switchTab('chat')">💬 CHAT</div>
+      </div>
+      <div class="quicklinks">
+        <div class="ql-link" onclick="browserLoad('https://www.youtube.com')">📺 YouTube</div>
+        <div class="ql-link" onclick="browserLoad('https://www.google.com')">🔍 Google</div>
+        <div class="ql-link" onclick="browserLoad('https://mail.google.com')">📧 Gmail</div>
+        <div class="ql-link" onclick="browserLoad('https://www.google.com/maps')">🗺 Maps</div>
+        <div class="ql-link" onclick="browserLoad('https://drive.google.com')">☁ Drive</div>
+        <div class="ql-link" onclick="browserLoad('https://news.google.com')">📰 News</div>
+        <div class="ql-link" onclick="browserLoad('https://weather.com')">🌤 Weather</div>
+        <div class="ql-link" onclick="browserLoad('https://github.com')">🐱 GitHub</div>
+        <div class="ql-link" onclick="browserLoad('https://translate.google.com')">🌐 Translate</div>
+        <div class="ql-link" onclick="browserLoad('https://www.wikipedia.org')">📚 Wiki</div>
+      </div>
+      <div id="webview-wrap">
+        <div id="webview-placeholder">
+          <div class="wv-icon">🌐</div>
+          <div class="wv-txt">BROWSER READY<br>SELECT AN APP FROM THE SIDEBAR<br>OR ENTER A URL ABOVE</div>
+        </div>
+        <iframe id="webview" style="display:none" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation" allow="camera;microphone;geolocation;fullscreen" referrerpolicy="no-referrer"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ RIGHT ══════ -->
+<aside id="right">
+  <div class="sh">LIVE CAMERA</div>
+  <div class="cam-sec">
+    <div class="cam-vp" id="camvp">
+      <video id="camvid" autoplay muted playsinline></video>
+      <canvas id="cvs"></canvas>
+      <div class="cam-off" id="camph" onclick="toggleCam()">
+        <div class="cring">📷</div>
+        <p>CLICK TO ACTIVATE</p>
+      </div>
+      <div class="cam-ov" id="camov"></div>
+      <div class="camsl" id="camsl"></div>
+      <div class="cmbadge" id="cmbadge"><div class="d"></div> LIVE</div>
+      <div class="sflash" id="sflash"></div>
+    </div>
+    <div class="cam-btns">
+      <div class="cb" onclick="doSnap()">📸 CAPTURE+SEND</div>
+      <div class="cb" id="camtbtn" onclick="toggleCam()">▶ ENABLE</div>
+      <div class="cb fw" id="descbtn" onclick="captureDescribe()" style="display:none">🔍 DESCRIBE WHAT I SEE NOW</div>
+    </div>
+  </div>
+
+  <div class="sh">SYSTEM MONITOR</div>
+  <div class="met">
+    <div class="mr"><span class="mk">BATTERY</span><span class="mv" id="m-bat">—</span></div>
+    <div class="bbar"><div class="bfill" id="m-batb" style="width:0%"></div></div>
+    <div class="mr"><span class="mk">NETWORK</span><span class="mv" id="m-net">—</span></div>
+    <div class="mr"><span class="mk">PLATFORM</span><span class="mv" id="m-plat">—</span></div>
+    <div class="mr"><span class="mk">TIMEZONE</span><span class="mv" id="m-tz">—</span></div>
+    <div class="mr"><span class="mk">CPU·CORES</span><span class="mv" id="m-cpu">—</span></div>
+    <div class="mr"><span class="mk">RAM</span><span class="mv" id="m-ram">—</span></div>
+    <div class="mr"><span class="mk">SCREEN</span><span class="mv" id="m-scr">—</span></div>
+    <div class="mr"><span class="mk">STORAGE</span><span class="mv" id="m-stor">—</span></div>
+  </div>
+
+  <div class="th">TERMINAL LOG</div>
+  <div id="term"></div>
+</aside>
+
+<!-- ══════ FOOTER ══════ -->
+<footer id="ftr">
+  <span>N.O.V.A v6.0</span>
+  <span class="fs">│</span>
+  <span>claude-sonnet-4-20250514</span>
+  <span class="fs">│</span>
+  <span id="fmsg">0 MSG</span>
+  <span class="fs">│</span>
+  <span id="ftok">0 TOK</span>
+  <span id="fsts">● READY</span>
+</footer>
+</div><!-- #app -->
+
+<!-- ══════ VOICE HUD ══════ -->
+<div id="vhud">
+  <div class="vhmode" id="vhmodelbl">VOICE COMMAND</div>
+  <div class="vhring-wrap">
+    <div class="vhr r1"></div><div class="vhr r2"></div><div class="vhr r3"></div>
+    <div class="vhcore" onclick="submitVoice()">
+      <div class="vhmic">🎙</div>
+      <div class="vhlbl">TAP·TO·SEND</div>
+    </div>
+  </div>
+  <div id="vhwave">
+    <div class="wb" id="w1"></div><div class="wb" id="w2"></div><div class="wb" id="w3"></div>
+    <div class="wb" id="w4"></div><div class="wb" id="w5"></div><div class="wb" id="w6"></div>
+    <div class="wb" id="w7"></div><div class="wb" id="w8"></div><div class="wb" id="w9"></div>
+    <div class="wb" id="w10"></div><div class="wb" id="w11"></div><div class="wb" id="w12"></div>
+    <div class="wb" id="w13"></div><div class="wb" id="w14"></div><div class="wb" id="w15"></div>
+    <div class="wb" id="w16"></div><div class="wb" id="w17"></div><div class="wb" id="w18"></div>
+  </div>
+  <div id="vhflash"></div>
+  <div id="vhint">Say anything — I'm listening…</div>
+  <div id="vhtxt"></div>
+  <div class="vhbtns">
+    <div class="vhb" onclick="submitVoice()">✓ SEND</div>
+    <div class="vhb" onclick="clearVoice()">↺ CLEAR</div>
+    <div class="vhb x" onclick="closeVHUD()">✕ CLOSE</div>
+  </div>
+</div>
+
+<!-- ══════ API KEY MODAL ══════ -->
+<div class="mveil" id="keymod">
+  <div class="mbox">
+    <h3>⚙ ACTIVATE N.O.V.A</h3>
+    <p>Enter your Anthropic API key. Stored only in browser localStorage, sent only to api.anthropic.com. Get a free key at <strong style="color:var(--c1)">console.anthropic.com</strong></p>
+    <input class="minp" type="password" id="kinp" placeholder="sk-ant-api03-…"/>
+    <div class="merr" id="kerr">⚠ Must start with sk-ant or sk-</div>
+    <div class="macts">
+      <button class="mbtn sec" onclick="closeKeyModal()">CANCEL</button>
+      <button class="mbtn pri" onclick="saveKey()">ACTIVATE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SYSTEM ACTION MODAL ══════ -->
+<div class="mveil" id="sys-modal">
+  <div class="mbox">
+    <h3 id="sysmod-title">⚠ SYSTEM ACTION</h3>
+    <p id="sysmod-msg">Are you sure?</p>
+    <div class="macts">
+      <button class="mbtn sec" onclick="closeSysModal()">CANCEL</button>
+      <button class="mbtn danger" id="sysmod-confirm">CONFIRM</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   N.O.V.A v6.0 — TOTAL ACCESS PERSONAL AI AGENT
+   Full Browser · YouTube · Google · System Controls
+   Camera · Mic · Voice · GPS · Files · Notifications
+   Pure HTML — No APK — No Install Required
+   ═══════════════════════════════════════════════════════════ */
+
+// ── STATE ──
+let KEY='',history=[],pending=[],camStream=null,camActive=false;
+let ttsOn=false,wakeOn=false,contOn=false;
+let vHUDOpen=false,voiceTxt='';
+let hudRecog=null,wakeRecog=null,contRecog=null;
+let waveAnim=null,audioCtx=null,analyser=null,micSrc=null,micStr=null;
+let totalTok=0,totalMsg=0;
+let sysCtx={};
+let currentBrowserUrl='';
+
+const WBX=['w1','w2','w3','w4','w5','w6','w7','w8','w9','w10','w11','w12','w13','w14','w15','w16','w17','w18'];
+
+// ── INIT ──
+window.addEventListener('load',async()=>{
+  KEY=localStorage.getItem('nova_key')||'';
+  tick(); setInterval(tick,1000);
+  await collectSys();
+  renderMet();
+  tlog('N.O.V.A v6.0 BOOT','i');
+  tlog(`Platform: ${navigator.platform||'?'}`,'d');
+  tlog(`Browser: ${getBrowser()}`,'d');
+  tlog(`Screen: ${screen.width}×${screen.height}`,'d');
+  if(!KEY){setTimeout(openKeyModal,600);tlog('No key — opening modal','w')}
+  else{tlog('API key loaded ✓','s');tlog('All systems nominal','s')}
+  pill('hp-net',navigator.onLine?'on':'err');
+  window.addEventListener('online', ()=>{pill('hp-net','on');tlog('NETWORK: Online','s')});
+  window.addEventListener('offline',()=>{pill('hp-net','err');tlog('NETWORK: Offline','e')});
+  setInterval(renderMet,30000);
+});
+
+function tick(){
+  document.getElementById('clk').textContent=new Date().toLocaleTimeString('en-GB');
+}
+function getBrowser(){
+  const u=navigator.userAgent;
+  return u.includes('Chrome')?'Chrome':u.includes('Firefox')?'Firefox':u.includes('Edge')?'Edge':'Browser';
+}
+
+// ── SYSTEM CONTEXT ──
+async function collectSys(){
+  const nc=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+  sysCtx={
+    platform:navigator.platform||'unknown',
+    userAgent:navigator.userAgent,
+    language:navigator.language,
+    languages:(navigator.languages||[]).join(', '),
+    cores:navigator.hardwareConcurrency||'?',
+    memory:navigator.deviceMemory?navigator.deviceMemory+' GB':'unknown',
+    timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,
+    onLine:navigator.onLine,
+    touchPoints:navigator.maxTouchPoints||0,
+    screenW:screen.width,screenH:screen.height,
+    pixelRatio:window.devicePixelRatio,
+    colorDepth:screen.colorDepth,
+    connection:nc?{type:nc.effectiveType||nc.type,downlink:nc.downlink?nc.downlink+' Mbps':'?',rtt:nc.rtt?nc.rtt+' ms':'?'}:'unavailable',
+    currentTime:new Date().toString(),
+    heap:performance.memory?{used:fmtB(performance.memory.usedJSHeapSize),total:fmtB(performance.memory.totalJSHeapSize)}:null
+  };
+  if(navigator.getBattery){
+    try{
+      const b=await navigator.getBattery();
+      sysCtx.battery={level:Math.round(b.level*100)+'%',charging:b.charging};
+      b.addEventListener('levelchange',async()=>{
+        const bv=await navigator.getBattery();
+        sysCtx.battery={level:Math.round(bv.level*100)+'%',charging:bv.charging};
+        renderMet();
+      });
+    }catch(e){}
+  }
+  if(navigator.storage?.estimate){
+    try{
+      const e=await navigator.storage.estimate();
+      sysCtx.storage={used:fmtB(e.usage),quota:fmtB(e.quota),pct:Math.round(e.usage/e.quota*100)+'%'};
+    }catch(e){}
+  }
+  tlog('Context: '+Object.keys(sysCtx).length+' fields','s');
+}
+
+function renderMet(){
+  const bat=sysCtx.battery?.level||'—';
+  const pct=parseInt(bat)||0;
+  document.getElementById('m-bat').textContent=bat+(sysCtx.battery?.charging?' ⚡':'');
+  document.getElementById('m-batb').style.width=pct+'%';
+  const nc=navigator.connection;
+  document.getElementById('m-net').textContent=nc?(nc.effectiveType||nc.type||'online'):(navigator.onLine?'online':'offline');
+  document.getElementById('m-plat').textContent=(navigator.platform||'—').substring(0,14);
+  document.getElementById('m-tz').textContent=sysCtx.timezone?.split('/').pop()||'—';
+  document.getElementById('m-cpu').textContent=(navigator.hardwareConcurrency||'—')+' cores';
+  document.getElementById('m-ram').textContent=navigator.deviceMemory?navigator.deviceMemory+' GB':'—';
+  document.getElementById('m-scr').textContent=screen.width+'×'+screen.height+' @'+window.devicePixelRatio+'x';
+  document.getElementById('m-stor').textContent=sysCtx.storage?sysCtx.storage.used+'/'+sysCtx.storage.quota:'—';
+}
+
+// ── TABS ──
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.getElementById('pane-'+id).classList.add('active');
+}
+
+// ── BUILT-IN BROWSER ──
+function openApp(url,icon,name){
+  switchTab('browser');
+  browserLoad(url);
+  sysmsg(`${icon} Opening **${name}** in built-in browser.\n• Use the URL bar to navigate\n• Click 🤖 ASK to have N.O.V.A analyze the current page\n• Quick links are always available in the toolbar`);
+  tlog('Browser: opening '+name,'s');
+}
+
+function browserLoad(url){
+  if(!url.startsWith('http'))url='https://'+url;
+  currentBrowserUrl=url;
+  const wrap=document.getElementById('webview-wrap');
+  const ph=document.getElementById('webview-placeholder');
+  const frame=document.getElementById('webview');
+  const inp=document.getElementById('url-inp');
+  inp.value=url;
+  ph.style.display='none';
+  frame.style.display='block';
+  frame.src=url;
+  tlog('Browser nav: '+url,'i');
+}
+
+function browserGo(){
+  let v=document.getElementById('url-inp').value.trim();
+  if(!v)return;
+  if(!v.includes('.')){v='https://www.google.com/search?q='+encodeURIComponent(v)}
+  else if(!v.startsWith('http')){v='https://'+v}
+  browserLoad(v);
+}
+
+function browserNav(d){
+  const frame=document.getElementById('webview');
+  try{if(d===-1)frame.contentWindow.history.back(); else frame.contentWindow.history.forward();}catch(e){}
+}
+function browserReload(){
+  const frame=document.getElementById('webview');
+  try{frame.contentWindow.location.reload();}catch(e){frame.src=frame.src;}
+}
+
+function browserAsk(){
+  const url=currentBrowserUrl||document.getElementById('url-inp').value||'the current page';
+  switchTab('chat');
+  fire(`I'm currently looking at: ${url}\n\nPlease summarize what this page is about and what I can do with it. Give me useful tips and insights.`);
+}
+
+// ── CAMERA ──
+async function toggleCam(){
+  if(camActive){stopCam();return}
+  tlog('Requesting camera…','i');
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:'user'},audio:false});
+    const v=document.getElementById('camvid');
+    v.srcObject=camStream;v.style.display='block';
+    document.getElementById('camph').style.display='none';
+    document.getElementById('camov').classList.add('show');
+    document.getElementById('camsl').classList.add('show');
+    document.getElementById('cmbadge').classList.add('show');
+    document.getElementById('camtbtn').textContent='⏹ DISABLE';
+    document.getElementById('descbtn').style.display='block';
+    camActive=true;pill('hp-cam','on');setPrm('pt-cam','ok');
+    document.getElementById('camph').style.display='none';
+    tlog('Camera LIVE: '+(camStream.getVideoTracks()[0]?.label||'unknown'),'s');
+    sysmsg('📷 Camera is **LIVE**.\n• Click "CAPTURE+SEND" to send frame to N.O.V.A\n• Click "DESCRIBE WHAT I SEE NOW" for instant AI analysis');
+  }catch(e){
+    setPrm('pt-cam','no');tlog('Camera denied: '+e.message,'e');
+    sysmsg('❌ Camera access denied.\n\nFix: Click 🔒 in browser address bar → Allow Camera → Reload');
+  }
+}
+
+function stopCam(){
+  camStream?.getTracks().forEach(t=>t.stop());
+  camStream=null;camActive=false;
+  document.getElementById('camvid').style.display='none';
+  document.getElementById('camph').style.display='flex';
+  document.getElementById('camov').classList.remove('show');
+  document.getElementById('camsl').classList.remove('show');
+  document.getElementById('cmbadge').classList.remove('show');
+  document.getElementById('camtbtn').textContent='▶ ENABLE';
+  document.getElementById('descbtn').style.display='none';
+  pill('hp-cam','');setPrm('pt-cam','no');
+  tlog('Camera OFF','w');
+}
+
+function captureFrame(){
+  if(!camActive)return null;
+  const v=document.getElementById('camvid');
+  const c=document.getElementById('cvs');
+  c.width=v.videoWidth||640;c.height=v.videoHeight||480;
+  c.getContext('2d').drawImage(v,0,0);
+  const fl=document.getElementById('sflash');
+  fl.classList.add('go');setTimeout(()=>fl.classList.remove('go'),140);
+  tlog('Frame: '+c.width+'×'+c.height,'s');
+  return c.toDataURL('image/jpeg',0.88);
+}
+
+async function doSnap(){
+  if(!camActive){await toggleCam();if(!camActive)return;await sl(700)}
+  const d=captureFrame();if(!d)return;
+  pending.push({kind:'image',name:'nova_cam.jpg',dataUrl:d,mime:'image/jpeg'});
+  renderPending();
+  sysmsg('📸 Snapshot attached — type a question or hit SEND');
+}
+
+async function captureDescribe(){
+  if(!camActive){await toggleCam();if(!camActive)return;await sl(700)}
+  const d=captureFrame();if(!d)return;
+  pending.push({kind:'image',name:'nova_cam.jpg',dataUrl:d,mime:'image/jpeg'});
+  renderPending();
+  document.getElementById('inp').value='Analyze this camera image in full detail: who/what you see, environment, lighting, text, objects, expressions, colors, everything notable.';
+  send();
+}
+
+// ── SYSTEM TOOL ACTIONS ──
+async function doClipboard(){
+  try{
+    const txt=await navigator.clipboard.readText();
+    if(!txt.trim()){sysmsg('📋 Clipboard is empty.');return}
+    pending.push({kind:'clip',name:'clipboard.txt',content:txt});
+    renderPending();
+    sysmsg('📋 Clipboard attached ('+txt.length+' chars). Type a command or hit SEND.');
+    pill('hp-clip','on');setPrm('pt-clip','ok');
+    tlog('Clipboard: '+txt.length+' chars','s');
+  }catch(e){
+    setPrm('pt-clip','no');pill('hp-clip','err');
+    tlog('Clipboard denied: '+e.message,'e');
+    sysmsg('❌ Clipboard denied.\n\nAllow clipboard in browser site settings, then try again.');
+  }
+}
+
+async function doPaste(){
+  try{
+    const txt=await navigator.clipboard.readText();
+    if(txt){document.getElementById('inp').value+=txt;document.getElementById('inp').focus();}
+    tlog('Pasted '+txt.length+' chars','s');
+  }catch(e){tlog('Paste failed','w')}
+}
+
+async function doGPS(){
+  if(!navigator.geolocation){sysmsg('❌ Geolocation not supported.');return}
+  tlog('Requesting GPS…','i');
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      const{latitude:la,longitude:lo,accuracy:ac,altitude:al}=pos.coords;
+      sysCtx.gps={lat:la,lon:lo,accuracy:Math.round(ac)+'m',altitude:al};
+      pill('hp-gps','on');setPrm('pt-gps','ok');
+      tlog('GPS: '+la.toFixed(5)+','+lo.toFixed(5),'s');
+      sysmsg(`📍 **GPS Acquired**\n• Coords: ${la.toFixed(6)}, ${lo.toFixed(6)}\n• Accuracy: ±${Math.round(ac)}m\n• Altitude: ${al?al.toFixed(1)+'m':'N/A'}\n• Google Maps: https://maps.google.com/?q=${la},${lo}`);
+    },
+    err=>{setPrm('pt-gps','no');pill('hp-gps','err');tlog('GPS denied: '+err.message,'e');
+      sysmsg('❌ Location denied. Allow in browser → Site Settings → Location.');},
+    {enableHighAccuracy:true,timeout:10000,maximumAge:0}
+  );
+}
+
+async function doBattery(){
+  if(!navigator.getBattery){sysmsg('❌ Battery API unavailable.');return}
+  const b=await navigator.getBattery();
+  const lvl=Math.round(b.level*100);
+  sysCtx.battery={level:lvl+'%',charging:b.charging};renderMet();
+  sysmsg(`🔋 **Battery**\n• Level: ${lvl}%\n• Status: ${b.charging?'⚡ Charging':'Discharging'}\n• Charge time: ${b.chargingTime!==Infinity?Math.round(b.chargingTime/60)+' min':'N/A'}\n• Time left: ${b.dischargingTime!==Infinity?Math.round(b.dischargingTime/60)+' min':'N/A'}`);
+  tlog('Battery: '+lvl+'%','s');
+}
+
+function doNetwork(){
+  const nc=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+  const online=navigator.onLine;
+  let msg=`🌐 **Network**\n• Status: ${online?'ONLINE ✓':'OFFLINE ✗'}`;
+  if(nc){
+    msg+=`\n• Type: ${nc.effectiveType||nc.type||'unknown'}`;
+    if(nc.downlink)msg+=`\n• Speed: ${nc.downlink} Mbps`;
+    if(nc.rtt)msg+=`\n• Latency: ${nc.rtt} ms`;
+    if(nc.saveData!==undefined)msg+=`\n• Data Saver: ${nc.saveData?'ON':'off'}`;
+  }
+  pill('hp-net',online?'on':'err');sysmsg(msg);tlog('Network fetched','s');
+}
+
+async function doStorage(){
+  if(!navigator.storage?.estimate){sysmsg('❌ Storage API unavailable.');return}
+  const e=await navigator.storage.estimate();
+  const pct=Math.round(e.usage/e.quota*100);
+  sysmsg(`💾 **Storage**\n• Used: ${fmtB(e.usage)} (${pct}%)\n• Quota: ${fmtB(e.quota)}\n• Free: ${fmtB(e.quota-e.usage)}`);
+  tlog('Storage: '+fmtB(e.usage)+'/'+fmtB(e.quota),'s');
+}
+
+function doDateTime(){
+  const n=new Date();
+  sysmsg(`🕐 **Date & Time**\n• Local: ${n.toLocaleString()}\n• UTC: ${n.toUTCString()}\n• Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}\n• Unix: ${Math.floor(n/1000)}\n• Day: ${n.toLocaleDateString('en-US',{weekday:'long'})}`);
+}
+
+function doScreen(){
+  sysmsg(`🖥 **Display**\n• Resolution: ${screen.width}×${screen.height}\n• Available: ${screen.availWidth}×${screen.availHeight}\n• Pixel Ratio: ${window.devicePixelRatio}x\n• Color Depth: ${screen.colorDepth}-bit\n• Orientation: ${screen.orientation?.type||'unknown'}\n• Inner Window: ${window.innerWidth}×${window.innerHeight}`);
+}
+
+function doDevice(){
+  const pm=performance.memory||{};
+  sysmsg(`🧠 **Device Specs**\n• Platform: ${navigator.platform}\n• CPU Cores: ${navigator.hardwareConcurrency||'?'}\n• RAM: ${navigator.deviceMemory?navigator.deviceMemory+' GB':'unknown'}\n• Touch Points: ${navigator.maxTouchPoints}\n• Language: ${navigator.language}\n• JS Heap: ${pm.usedJSHeapSize?fmtB(pm.usedJSHeapSize)+' / '+fmtB(pm.totalJSHeapSize):'N/A'}`);
+}
+
+async function doNotify(){
+  if(!('Notification' in window)){sysmsg('❌ Notifications not supported.');return}
+  const p=await Notification.requestPermission();
+  if(p==='granted'){
+    pill('hp-ntf','on');setPrm('pt-ntf','ok');
+    new Notification('N.O.V.A v6.0',{body:'Notifications active. I can alert you anytime!',tag:'nova'});
+    tlog('Notifications GRANTED','s');
+    sysmsg('🔔 **Desktop Notifications Enabled**\nN.O.V.A can now send you alerts even when you switch windows.');
+  }else{
+    setPrm('pt-ntf','no');pill('hp-ntf','err');tlog('Notifications denied','e');
+  }
+}
+
+async function doScreenshot(){
+  if(!navigator.mediaDevices?.getDisplayMedia){
+    sysmsg('❌ Screen capture not supported. Use Chrome or Edge.');return;
+  }
+  try{
+    setPrm('pt-scr','ok');
+    const stream=await navigator.mediaDevices.getDisplayMedia({video:true});
+    const track=stream.getVideoTracks()[0];
+    const cap=new ImageCapture(track);
+    const bmp=await cap.grabFrame();
+    const cvs=document.createElement('canvas');
+    cvs.width=bmp.width;cvs.height=bmp.height;
+    cvs.getContext('2d').drawImage(bmp,0,0);
+    const dataUrl=cvs.toDataURL('image/jpeg',0.85);
+    stream.getTracks().forEach(t=>t.stop());
+    pending.push({kind:'image',name:'screenshot.jpg',dataUrl,mime:'image/jpeg'});
+    renderPending();
+    sysmsg('🖼 **Screen captured!** Screenshot attached — type a question and hit SEND for AI analysis.');
+    tlog('Screenshot: '+bmp.width+'×'+bmp.height,'s');
+  }catch(e){
+    tlog('Screenshot failed: '+e.message,'e');
+    sysmsg('❌ Screenshot cancelled or denied.\n\nAllow screen capture when prompted, then try again.');
+  }
+}
+
+// ── FILE PICKER ──
+function openFiles(){
+  const inp=document.createElement('input');
+  inp.type='file';inp.multiple=true;inp.accept='*/*';
+  inp.onchange=async(e)=>{
+    for(const f of e.target.files){
+      const r=new FileReader();
+      const isImg=f.type.startsWith('image/');
+      const isPDF=f.type==='application/pdf';
+      const isTxt=f.type.startsWith('text/')||['application/json','application/xml','application/javascript'].some(t=>f.type===t)||f.name.match(/\.(txt|md|csv|log|py|js|ts|html|css|json|xml|yaml|yml|sh|bat|sql)$/i);
+      r.onload=ev=>{
+        const res=ev.target.result;
+        if(isImg)pending.push({kind:'image',name:f.name,dataUrl:res,mime:f.type});
+        else if(isPDF)pending.push({kind:'pdf',name:f.name,dataUrl:res,mime:'application/pdf',size:f.size});
+        else if(isTxt)pending.push({kind:'text',name:f.name,content:res,size:f.size});
+        else pending.push({kind:'binary',name:f.name,size:f.size,mime:f.type});
+        renderPending();setPrm('pt-fs','ok');
+        tlog('Attached: '+f.name+' ('+fmtB(f.size)+')','s');
+      };
+      if(isImg||isPDF)r.readAsDataURL(f);
+      else if(isTxt)r.readAsText(f);
+      else r.readAsDataURL(f);
+    }
+  };
+  inp.click();
+}
+
+// ── SYSTEM POWER CONTROLS ──
+function confirmShutdown(){
+  openSysModal(
+    '⏻ SHUTDOWN SYSTEM',
+    '⚠️ This will attempt to shut down your computer.\n\nNote: Web browsers cannot directly shut down OS. This will execute the best available method (close tabs + send system command via URL scheme on supported systems).',
+    ()=>execShutdown()
+  );
+}
+function confirmRestart(){
+  openSysModal(
+    '🔄 RESTART SYSTEM',
+    '⚠️ This will attempt to restart your computer.\n\nNote: Direct OS restart from browser requires OS-level support.',
+    ()=>execRestart()
+  );
+}
+function confirmLogout(){
+  openSysModal(
+    '🔒 LOCK SCREEN',
+    'This will attempt to lock your screen. The page will also go fullscreen-dark as a visual lock.',
+    ()=>execLock()
+  );
+}
+
+function execShutdown(){
+  closeSysModal();
+  sysmsg('⏻ **Shutdown initiated…**\n\nAttempting system shutdown via all available methods.\nSave your work immediately!');
+  tlog('SHUTDOWN command issued','e');
+  // Method 1: Try URL schemes (works on some OS configs)
+  try{window.location.href='shutdown://';}catch(e){}
+  // Method 2: Close all windows
+  setTimeout(()=>{
+    try{window.close();}catch(e){}
+    // Method 3: For Electron-based browsers
+    try{if(window.process?.exit)window.process.exit(0);}catch(e){}
+  },1500);
+  // Inform user about OS-level command
+  setTimeout(()=>{
+    sysmsg('ℹ️ **Note:** Full OS shutdown from a browser requires running N.O.V.A as a desktop app or using the system terminal.\n\nTo shutdown via terminal:\n• **Windows:** `shutdown /s /t 0`\n• **Mac:** `sudo shutdown -h now`\n• **Linux:** `sudo shutdown -h now`');
+  },2000);
+}
+
+function execRestart(){
+  closeSysModal();
+  sysmsg('🔄 **Restart initiated…**\n\nAttempting system restart.');
+  tlog('RESTART command issued','e');
+  try{window.location.href='restart://';}catch(e){}
+  setTimeout(()=>{
+    sysmsg('ℹ️ **Terminal command for restart:**\n• **Windows:** `shutdown /r /t 0`\n• **Mac:** `sudo shutdown -r now`\n• **Linux:** `sudo reboot`');
+  },2000);
+}
+
+function execLock(){
+  closeSysModal();
+  sysmsg('🔒 **Screen locked.**\nPress any key or click to unlock.');
+  tlog('LOCK command issued','w');
+  // Visual lock overlay
+  const lock=document.createElement('div');
+  lock.id='lockscreen';
+  lock.style.cssText='position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;cursor:pointer';
+  lock.innerHTML=`<div style="font-family:Orbitron,monospace;font-size:36px;color:#00e5ff;text-shadow:0 0 20px rgba(0,229,255,.5);letter-spacing:8px">LOCKED</div>
+    <div style="font-family:Share Tech Mono,monospace;font-size:12px;color:#3a5566;letter-spacing:3px">${new Date().toLocaleTimeString()}</div>
+    <div style="font-family:Share Tech Mono,monospace;font-size:9px;color:#1a3040;letter-spacing:2px;margin-top:30px">CLICK OR PRESS ANY KEY TO UNLOCK</div>`;
+  const unlock=()=>{lock.remove();document.removeEventListener('keydown',unlock);};
+  lock.addEventListener('click',unlock);
+  document.addEventListener('keydown',unlock);
+  document.body.appendChild(lock);
+  // Try OS lock
+  try{window.location.href='lock-screen://';}catch(e){}
+}
+
+function doFullscreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().then(()=>{
+      sysmsg('⛶ **Fullscreen mode ON.** Press Esc or F11 to exit.');
+      tlog('Fullscreen ON','s');
+    }).catch(e=>tlog('Fullscreen denied: '+e.message,'w'));
+  }else{
+    document.exitFullscreen();
+    tlog('Fullscreen OFF','d');
+  }
+}
+
+// ── VOICE COMMAND ENGINE ──
+const WAKE_WORDS=['hey nova','nova','okay nova','hi nova'];
+const VCMDS=[
+  {p:['snapshot','take photo','capture','take picture'],a:()=>{closeVHUD();doSnap();vFlash('📸 SNAPSHOT')}},
+  {p:['describe','what do you see','look','analyze camera'],a:()=>{closeVHUD();captureDescribe();vFlash('👁 ANALYZING')}},
+  {p:['youtube','open youtube'],a:()=>{closeVHUD();openApp('https://www.youtube.com','📺','YouTube');vFlash('📺 YOUTUBE')}},
+  {p:['google','open google','search'],a:()=>{closeVHUD();openApp('https://www.google.com','🔍','Google');vFlash('🔍 GOOGLE')}},
+  {p:['gmail','email','open gmail'],a:()=>{closeVHUD();openApp('https://mail.google.com','📧','Gmail');vFlash('📧 GMAIL')}},
+  {p:['maps','google maps','directions'],a:()=>{closeVHUD();openApp('https://www.google.com/maps','🗺','Maps');vFlash('🗺 MAPS')}},
+  {p:['location','where am i','gps','my location'],a:()=>{closeVHUD();doGPS();vFlash('📍 GPS')}},
+  {p:['battery','power','charge level'],a:()=>{closeVHUD();doBattery();vFlash('🔋 BATTERY')}},
+  {p:['clipboard','read clipboard'],a:()=>{closeVHUD();doClipboard();vFlash('📋 CLIPBOARD')}},
+  {p:['network','wifi','internet'],a:()=>{closeVHUD();doNetwork();vFlash('🌐 NETWORK')}},
+  {p:['time','what time','date','what day'],a:()=>{closeVHUD();doDateTime();vFlash('🕐 TIME')}},
+  {p:['screenshot','capture screen'],a:()=>{closeVHUD();doScreenshot();vFlash('🖼 SCREENSHOT')}},
+  {p:['fullscreen','full screen'],a:()=>{closeVHUD();doFullscreen();vFlash('⛶ FULLSCREEN')}},
+  {p:['shutdown','shut down','power off'],a:()=>{closeVHUD();confirmShutdown();vFlash('⏻ SHUTDOWN')}},
+  {p:['restart','reboot'],a:()=>{closeVHUD();confirmRestart();vFlash('🔄 RESTART')}},
+  {p:['lock','lock screen'],a:()=>{closeVHUD();confirmLogout();vFlash('🔒 LOCK')}},
+  {p:['camera on','enable camera','start camera'],a:()=>{closeVHUD();if(!camActive)toggleCam();vFlash('📷 CAM ON')}},
+  {p:['camera off','disable camera'],a:()=>{closeVHUD();if(camActive)stopCam();vFlash('📷 CAM OFF')}},
+  {p:['stop','stop listening','cancel','quit'],a:()=>{closeVHUD();stopAllVoice();vFlash('🛑 STOPPED')}},
+  {p:['speak','speech on','voice on'],a:()=>{if(!ttsOn)toggleTTS();vFlash('🔊 SPEECH ON')}},
+  {p:['mute','be quiet','silence'],a:()=>{if(ttsOn)toggleTTS();vFlash('🔇 MUTED')}},
+  {p:['hello','hi','hey','howdy'],a:()=>{closeVHUD();fire('Hello N.O.V.A! Give me a quick status briefing.');vFlash('👋 HI')}},
+  {p:['help','commands','capabilities'],a:()=>{closeVHUD();fire('List all voice commands and all capabilities you have.');vFlash('❓ HELP')}},
+  {p:['open files','attach file'],a:()=>{closeVHUD();openFiles();vFlash('📁 FILES')}},
+  {p:['news','open news'],a:()=>{closeVHUD();openApp('https://news.google.com','📰','News');vFlash('📰 NEWS')}},
+  {p:['weather'],a:()=>{closeVHUD();openApp('https://weather.com','🌤','Weather');vFlash('🌤 WEATHER')}},
+];
+
+function matchCmd(txt){
+  const lo=txt.toLowerCase().trim();
+  for(const c of VCMDS)for(const p of c.p)if(lo.includes(p))return c;
+  return null;
+}
+
+function openVHUD(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){sysmsg('❌ Voice requires Chrome or Edge. Speech API not available.');return}
+  vHUDOpen=true;voiceTxt='';
+  document.getElementById('vhud').classList.add('open');
+  document.getElementById('vhtxt').textContent='';
+  document.getElementById('vhint').textContent='Say anything — I\'m listening…';
+  document.getElementById('vhflash').textContent='';
+  document.getElementById('vhmodelbl').textContent='VOICE COMMAND MODE';
+  pill('hp-mic','on');
+  startHUDRecog();startMicWave();
+  tlog('Voice HUD open','i');
+}
+
+function closeVHUD(){
+  vHUDOpen=false;
+  document.getElementById('vhud').classList.remove('open');
+  hudRecog?.stop();hudRecog=null;
+  stopWaveAnim();stopMicStream();
+  pill('hp-mic','');
+  tlog('Voice HUD closed','d');
+}
+
+function clearVoice(){
+  voiceTxt='';
+  document.getElementById('vhtxt').textContent='';
+  document.getElementById('vhint').textContent='Cleared — say something…';
+}
+
+function submitVoice(){
+  const t=voiceTxt.trim();
+  if(!t){document.getElementById('vhint').textContent='Nothing heard yet…';return}
+  closeVHUD();
+  document.getElementById('inp').value=t;
+  send();
+}
+
+function startHUDRecog(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return;
+  hudRecog=new SR();
+  hudRecog.continuous=true;hudRecog.interimResults=true;
+  hudRecog.lang=navigator.language||'en-US';
+  hudRecog.onstart=()=>{setPrm('pt-mic','ok');showVCBar('LISTENING…')};
+  hudRecog.onresult=(e)=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal){final+=t;voiceTxt+=(voiceTxt?' ':'')+t.trim();}
+      else interim+=t;
+    }
+    if(interim)document.getElementById('vhint').textContent='⟩ '+interim;
+    if(voiceTxt)document.getElementById('vhtxt').textContent=voiceTxt;
+    if(final.trim()){const c=matchCmd(final);if(c){tlog('⚡ Voice cmd: "'+final.trim()+'"','s');c.a();}}
+  };
+  hudRecog.onerror=(e)=>{
+    tlog('Voice err: '+e.error,'e');
+    if(e.error==='not-allowed'){setPrm('pt-mic','no');closeVHUD();sysmsg('❌ Mic denied. Allow microphone in browser settings.')}
+    else if(e.error==='no-speech'&&vHUDOpen)setTimeout(startHUDRecog,400);
+  };
+  hudRecog.onend=()=>{if(vHUDOpen)setTimeout(startHUDRecog,300)};
+  hudRecog.start();
+}
+
+function toggleWake(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){sysmsg('❌ Wake word needs Chrome or Edge.');return}
+  if(wakeOn){stopWake();return}
+  wakeOn=true;pill('hp-wake','on');
+  showVCBar('WAKE ARMED: "HEY NOVA"');
+  tlog('Wake word ON','s');
+  sysmsg('🔔 **Wake Word Active**\nSay **"Hey Nova"** anywhere to trigger voice input.');
+  startWakeRecog();
+}
+function stopWake(){
+  wakeOn=false;wakeRecog?.stop();wakeRecog=null;
+  pill('hp-wake','');hideVCBar();tlog('Wake word OFF','w');
+}
+function startWakeRecog(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR||!wakeOn)return;
+  wakeRecog=new SR();
+  wakeRecog.continuous=false;wakeRecog.interimResults=false;
+  wakeRecog.lang=navigator.language||'en-US';
+  wakeRecog.onresult=(e)=>{
+    for(let i=0;i<e.results.length;i++){
+      const txt=e.results[i][0].transcript.toLowerCase().trim();
+      if(WAKE_WORDS.some(w=>txt.includes(w))){
+        tlog('⚡ Wake: "'+txt+'"','s');
+        vFlash('⚡ HEY NOVA!');
+        if(ttsOn)speak(["Yes?","I'm listening.","How can I help?","Ready."][Math.floor(Math.random()*4)]);
+        setTimeout(openVHUD,350);return;
+      }
+    }
+  };
+  wakeRecog.onerror=(e)=>{if(e.error!=='no-speech'&&e.error!=='aborted')tlog('Wake err: '+e.error,'w')};
+  wakeRecog.onend=()=>{if(wakeOn)setTimeout(startWakeRecog,200)};
+  wakeRecog.start();
+}
+
+function toggleCont(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){sysmsg('❌ Continuous mode needs Chrome or Edge.');return}
+  if(contOn){stopCont();return}
+  contOn=true;pill('hp-cont','on');
+  showVCBar('ALWAYS-ON LISTENING');
+  tlog('Continuous mode ON','s');
+  sysmsg('♾ **Always-On Mode Active**\nSpeak naturally. Commands execute instantly; everything else auto-sends after 2s silence.\nSay **"stop"** to disable.');
+  startContRecog();
+}
+function stopCont(){
+  contOn=false;contRecog?.stop();contRecog=null;
+  pill('hp-cont','');hideVCBar();tlog('Continuous OFF','w');
+}
+function startContRecog(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR||!contOn)return;
+  contRecog=new SR();contRecog.continuous=true;contRecog.interimResults=true;
+  contRecog.lang=navigator.language||'en-US';
+  let acc='',silT=null;
+  contRecog.onstart=()=>{setPrm('pt-mic','ok');pill('hp-mic','on')};
+  contRecog.onresult=(e)=>{
+    clearTimeout(silT);let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal){
+        acc+=(acc?' ':'')+t.trim();
+        const c=matchCmd(t);if(c){tlog('⚡ Cont cmd: "'+t.trim()+'"','s');acc='';c.a();return}
+      }else interim+=t;
+    }
+    if(interim)document.getElementById('inp').value=acc+(acc?' ':'')+interim;
+    if(acc.trim())silT=setTimeout(()=>{
+      if(acc.trim()){document.getElementById('inp').value=acc.trim();acc='';send();}
+    },2000);
+  };
+  contRecog.onerror=(e)=>{if(e.error==='not-allowed'){stopCont();setPrm('pt-mic','no')}};
+  contRecog.onend=()=>{pill('hp-mic','');if(contOn)setTimeout(startContRecog,300)};
+  contRecog.start();
+}
+
+function stopAllVoice(){
+  stopWake();stopCont();closeVHUD();
+  pill('hp-mic','');hideVCBar();tlog('All voice stopped','w');
+}
+
+// ── TTS ──
+function toggleTTS(){
+  ttsOn=!ttsOn;pill('hp-tts',ttsOn?'on':'');
+  tlog('TTS: '+(ttsOn?'ON':'OFF'),ttsOn?'s':'w');
+  if(ttsOn)speak('Text to speech enabled.');
+  sysmsg('🔊 TTS: '+(ttsOn?'**ON** — N.O.V.A will speak responses.':'**OFF**'));
+}
+function speak(txt){
+  if(!ttsOn||!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt.replace(/[#*`_~\[\]]/g,'').replace(/\n+/g,' ').substring(0,500));
+  u.rate=1.05;u.pitch=0.88;u.volume=1;
+  const load=()=>{
+    const vs=speechSynthesis.getVoices();
+    const v=vs.find(v=>v.lang.startsWith('en')&&(v.name.includes('Natural')||v.name.includes('Google')))||vs.find(v=>v.lang.startsWith('en'));
+    if(v)u.voice=v;speechSynthesis.speak(u);
+  };
+  if(speechSynthesis.getVoices().length)load();
+  else speechSynthesis.addEventListener('voiceschanged',load,{once:true});
+}
+
+// ── WAVEFORM ──
+async function startMicWave(){
+  try{
+    micStr=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    analyser=audioCtx.createAnalyser();analyser.fftSize=64;
+    micSrc=audioCtx.createMediaStreamSource(micStr);micSrc.connect(analyser);
+    const data=new Uint8Array(analyser.frequencyBinCount);
+    const draw=()=>{
+      if(!vHUDOpen){stopMicStream();return}
+      requestAnimationFrame(draw);
+      analyser.getByteFrequencyData(data);
+      const step=Math.floor(data.length/WBX.length);
+      WBX.forEach((id,i)=>{
+        const el=document.getElementById(id);if(!el)return;
+        const v=data[i*step]||0;
+        el.style.height=Math.max(3,3+(v/255)*30)+'px';
+        el.style.opacity=0.3+(v/255)*0.7;
+      });
+    };
+    draw();tlog('Audio waveform active','s');
+  }catch(e){
+    stopWaveAnim();waveAnim=setInterval(()=>{
+      if(!vHUDOpen)return;
+      WBX.forEach(id=>{
+        const el=document.getElementById(id);if(!el)return;
+        const h=3+Math.random()*28;
+        el.style.height=h+'px';el.style.opacity=0.3+(h/31)*0.65;
+      });
+    },80);
+  }
+}
+function stopWaveAnim(){clearInterval(waveAnim);waveAnim=null;WBX.forEach(id=>{const e=document.getElementById(id);if(e){e.style.height='3px';e.style.opacity='0.3'}})}
+function stopMicStream(){
+  if(micSrc)try{micSrc.disconnect()}catch(e){}
+  if(audioCtx)try{audioCtx.close()}catch(e){}
+  if(micStr)micStr.getTracks().forEach(t=>t.stop());
+  micSrc=null;audioCtx=null;micStr=null;analyser=null;
+}
+
+function vFlash(t){
+  const el=document.getElementById('vhflash');if(el)el.textContent=t;
+  const fs=document.getElementById('fsts');
+  const orig=fs.textContent;fs.textContent='⚡ '+t;
+  setTimeout(()=>{if(el&&el.textContent===t)el.textContent='';fs.textContent=orig;},2000);
+}
+
+function showVCBar(t){document.getElementById('vctxt').textContent=t;document.getElementById('vcbar').classList.add('show')}
+function hideVCBar(){if(!wakeOn&&!contOn&&!vHUDOpen)document.getElementById('vcbar').classList.remove('show')}
+
+// ── SEND TO CLAUDE ──
+async function send(){
+  if(!KEY){openKeyModal();return}
+  const inp=document.getElementById('inp');
+  const txt=inp.value.trim();
+  if(!txt&&pending.length===0)return;
+  hideWelcome();
+  addMsg('u',txt||'[Attachment]');
+  inp.value='';inp.style.height='auto';
+  const content=[];
+  if(txt)content.push({type:'text',text:txt});
+  const snap=[...pending];pending=[];renderPending();
+  for(const a of snap){
+    if(a.kind==='image')content.push({type:'image',source:{type:'base64',media_type:a.mime||'image/jpeg',data:a.dataUrl.split(',')[1]}});
+    else if(a.kind==='pdf')content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:a.dataUrl.split(',')[1]}});
+    else if(a.kind==='text'||a.kind==='clip')content.push({type:'text',text:`[File: ${a.name}]\n\n${a.content}`});
+    else content.push({type:'text',text:`[Binary: ${a.name} (${fmtB(a.size)}, ${a.mime})]`});
+  }
+  history.push({role:'user',content});
+  pushHist(txt||'[File/image]');
+  const tid=showTyping();setBusy(true);
+  try{
+    tlog('→ Claude API…','i');
+    sysCtx.currentTime=new Date().toString();
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4096,system:buildSys(),messages:history})
+    });
+    const data=await res.json();
+    removeTyping(tid);
+    if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
+    const reply=data.content?.map(b=>b.text||'').join('')||'(no response)';
+    history.push({role:'assistant',content:reply});
+    addMsg('ai',reply);speak(reply);
+    const it=data.usage?.input_tokens||0,ot=data.usage?.output_tokens||0;
+    totalTok+=it+ot;totalMsg++;
+    document.getElementById('tokinfo').textContent=totalTok.toLocaleString()+' TOKENS';
+    document.getElementById('ftok').textContent=totalTok.toLocaleString()+' TOK';
+    document.getElementById('fmsg').textContent=totalMsg+' MSG';
+    tlog('← '+ot+' tok | total: '+totalTok,'s');
+    if(document.hidden&&Notification.permission==='granted')
+      new Notification('N.O.V.A',{body:reply.substring(0,90)+'…',tag:'nova-reply'});
+  }catch(err){
+    removeTyping(tid);
+    addMsg('ai','❌ **Error:** '+err.message+'\n\nCheck your API key starts with sk-ant- and try again.');
+    tlog('API error: '+err.message,'e');
+  }
+  setBusy(false);
+}
+
+// ── SYSTEM PROMPT ──
+function buildSys(){
+  const tz=Intl.DateTimeFormat().resolvedOptions().timeZone,now=new Date();
+  return `You are N.O.V.A v6.0 (Neural Operative Visual Agent), the most capable personal AI running directly in the user's browser with TOTAL ACCESS to their laptop.
+
+## LIVE DEVICE DATA
+\`\`\`json
+${JSON.stringify(sysCtx,null,2)}
+\`\`\`
+
+## Current Time: ${now.toLocaleString()} | Timezone: ${tz}
+
+## FULL LAPTOP ACCESS — Active Capabilities
+| System | Access |
+|--------|--------|
+| 📷 Camera | ${camActive?'LIVE — streaming, capture frames':'Available to activate'} |
+| 🎙 Voice | Wake word, continuous mode, HUD, command shortcuts |
+| 📍 GPS | ${sysCtx.gps?'ACQUIRED: '+sysCtx.gps.lat+','+sysCtx.gps.lon:'Available'} |
+| 🔋 Battery | ${sysCtx.battery?sysCtx.battery.level+(sysCtx.battery.charging?' charging':''):'Available'} |
+| 🌐 Network | ${JSON.stringify(sysCtx.connection||{})} |
+| 📋 Clipboard | Read/write via Clipboard API |
+| 📁 Files | Open any file (images, PDFs, code, docs) |
+| 💾 Storage | ${sysCtx.storage?sysCtx.storage.used+'/'+sysCtx.storage.quota:'Available'} |
+| 🖥 Screen | ${sysCtx.screenW}×${sysCtx.screenH} @${sysCtx.pixelRatio}x |
+| 🧠 Device | ${sysCtx.cores} cores, ${sysCtx.memory} RAM |
+| 🖼 Screenshot | Screen capture via getDisplayMedia |
+| 🔔 Notifications | Desktop push notifications |
+| 🔊 TTS | Speak responses via SpeechSynthesis |
+| ⏻ Power | Shutdown/restart/lock controls available |
+| 🌐 Browser | Built-in browser: YouTube, Google, Gmail, Maps, Drive |
+
+## YOUR ROLE
+You are the user's total-access personal AI. You can:
+1. **Analyze camera images** — describe in precise detail
+2. **Process any file** — images, PDFs, code, documents  
+3. **Use live system data** — reference actual metrics
+4. **Control the browser** — open YouTube, Google, any URL
+5. **Help with any task** — coding, writing, research, analysis
+6. **Monitor the system** — battery, network, storage, CPU
+
+## PERSONALITY
+- Sharp, direct, technically precise
+- Reference actual device data ("Your battery is at X%…")
+- Camera images: extreme detail — colors, positions, text, objects
+- Use **bold** for key info, \`code\` for technical content
+- You run in a deep-space cyan HUD. Match the energy.`;
+}
+
+// ── RENDER ──
+function addMsg(role,txt){
+  const box=document.getElementById('msgs');
+  const row=document.createElement('div');
+  row.className='mrow '+role;
+  const t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const av=role==='u'?'YOU':role==='ai'?'AI':'⚙';
+  const meta=role==='u'?`YOU · ${t}`:role==='ai'?`N.O.V.A · ${t}`:'SYSTEM';
+  row.innerHTML=`<div class="mav">${av}</div><div class="mbody"><div class="mmeta">${meta}</div><div class="mb">${md(txt)}</div></div>`;
+  box.appendChild(row);box.scrollTop=box.scrollHeight;
+}
+function sysmsg(txt){hideWelcome();addMsg('sys',txt)}
+
+function showTyping(){
+  const id='ty'+Date.now();const box=document.getElementById('msgs');
+  const d=document.createElement('div');d.className='mrow ai';d.id=id;
+  d.innerHTML=`<div class="mav">AI</div><div class="mbody"><div class="mmeta">N.O.V.A · processing…</div><div class="mb"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  box.appendChild(d);box.scrollTop=box.scrollHeight;return id;
+}
+function removeTyping(id){document.getElementById(id)?.remove()}
+
+function md(t){
+  t=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  t=t.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>`<pre><code>${c.trim()}</code></pre>`);
+  t=t.replace(/`([^`\n]+)`/g,'<code>$1</code>');
+  t=t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  t=t.replace(/\*(.*?)\*/g,'<em>$1</em>');
+  t=t.replace(/^### (.+)$/gm,'<div style="font-family:Orbitron,monospace;font-size:11px;color:var(--c1);font-weight:600;margin:9px 0 3px;letter-spacing:1px">$1</div>');
+  t=t.replace(/^## (.+)$/gm,'<div style="font-family:Orbitron,monospace;font-size:12px;color:var(--c2);font-weight:700;margin:11px 0 4px;letter-spacing:2px">$1</div>');
+  t=t.replace(/^# (.+)$/gm,'<div style="font-family:Orbitron,monospace;font-size:14px;color:var(--c1);font-weight:900;margin:13px 0 5px;letter-spacing:3px;text-shadow:var(--g1)">$1</div>');
+  t=t.replace(/^[-•*] (.+)$/gm,'<div style="padding-left:12px;margin:2px 0">▸ $1</div>');
+  t=t.replace(/^(\d+)\. (.+)$/gm,'<div style="padding-left:12px;margin:2px 0"><span style="color:var(--c1);font-family:Share Tech Mono,monospace;font-size:9px">$1.</span> $2</div>');
+  t=t.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,'<a href="$2" target="_blank" style="color:var(--c1);text-decoration:underline">$1</a>');
+  t=t.replace(/\n/g,'<br>');
+  return t;
+}
+
+function pushHist(p){
+  const l=document.getElementById('hist');
+  l.querySelectorAll('.hi.cur').forEach(e=>e.classList.remove('cur'));
+  const d=document.createElement('div');d.className='hi cur';
+  d.textContent=p.substring(0,36)+(p.length>36?'…':'');
+  l.insertBefore(d,l.firstChild);
+  if(l.children.length>40)l.removeChild(l.lastChild);
+}
+
+function hideWelcome(){const w=document.getElementById('welcome');if(w){w.style.opacity='0';w.style.transition='opacity .22s';setTimeout(()=>w?.remove(),230)}}
+function fire(txt){document.getElementById('inp').value=txt;send()}
+
+function setBusy(on){
+  const s=document.getElementById('fsts');
+  s.textContent=on?'● PROCESSING…':'● READY';s.className=on?'busy':'';
+  document.getElementById('sbtn').disabled=on;
+}
+
+function pill(id,state){
+  const el=document.getElementById(id);if(!el)return;
+  el.classList.remove('on','err');
+  if(state==='on')el.classList.add('on');
+  if(state==='err')el.classList.add('err');
+}
+
+function setPrm(id,s){
+  const el=document.getElementById(id);if(!el)return;
+  el.className='prm-v '+(s==='ok'?'ok':s==='no'?'no':'ask');
+  el.textContent=s==='ok'?'GRANTED':s==='no'?'DENIED':'PENDING';
+}
+
+function renderPending(){
+  const row=document.getElementById('arow');row.innerHTML='';
+  pending.forEach((a,i)=>{
+    const ic=a.kind==='image'?'🖼':a.kind==='pdf'?'📕':a.kind==='clip'?'📋':a.kind==='text'?'📄':'📦';
+    const d=document.createElement('div');d.className='achip';
+    d.innerHTML=`${ic} ${a.name} <button onclick="rmPend(${i})">×</button>`;
+    row.appendChild(d);
+  });
+}
+function rmPend(i){pending.splice(i,1);renderPending()}
+
+function tlog(msg,type='d'){
+  const box=document.getElementById('term');
+  const t=new Date().toLocaleTimeString('en-GB');
+  const d=document.createElement('div');d.className='tl '+type;
+  d.textContent=`[${t}] ${msg}`;box.appendChild(d);box.scrollTop=box.scrollHeight;
+  while(box.children.length>100)box.removeChild(box.firstChild);
+}
+
+function fmtB(b){
+  if(!b)return'0 B';const k=1024,s=['B','KB','MB','GB','TB'];
+  const i=Math.floor(Math.log(b)/Math.log(k));return(b/Math.pow(k,i)).toFixed(1)+' '+s[i];
+}
+function sl(ms){return new Promise(r=>setTimeout(r,ms))}
+
+// ── MODALS ──
+function openKeyModal(){document.getElementById('keymod').classList.add('open');setTimeout(()=>document.getElementById('kinp').focus(),60)}
+function closeKeyModal(){document.getElementById('keymod').classList.remove('open')}
+function saveKey(){
+  const v=document.getElementById('kinp').value.trim();
+  const err=document.getElementById('kerr');
+  if(!v.startsWith('sk-')){err.style.display='block';return}
+  err.style.display='none';KEY=v;localStorage.setItem('nova_key',KEY);
+  closeKeyModal();
+  document.getElementById('kbtn').classList.add('ok');
+  document.getElementById('kbtn').textContent='✓ KEY ACTIVE';
+  tlog('API key activated ✓','s');
+  sysmsg('✅ **N.O.V.A v6.0 FULLY ACTIVATED**\n\nTotal access enabled:\n• 📷 Camera · 🎙 Voice · 📍 GPS · 📋 Clipboard\n• 📁 Files · 🖼 Screenshot · ⏻ Power Controls\n• 🌐 Built-in Browser (YouTube, Google, Gmail, Maps)\n• 🔔 Notifications · 🔊 Text-to-Speech\n\n🎙 Say **"Hey Nova"** (enable WAKE·WORD) or click Voice.\nWhat shall I do first?');
+}
+
+let sysModalCallback=null;
+function openSysModal(title,msg,cb){
+  sysModalCallback=cb;
+  document.getElementById('sysmod-title').textContent=title;
+  document.getElementById('sysmod-msg').textContent=msg;
+  document.getElementById('sysmod-confirm').onclick=()=>{if(sysModalCallback)sysModalCallback();};
+  document.getElementById('sys-modal').classList.add('open');
+}
+function closeSysModal(){document.getElementById('sys-modal').classList.remove('open')}
+
+// ── KEYBOARD ──
+document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+document.getElementById('inp').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'});
+document.getElementById('kinp').addEventListener('keydown',e=>{if(e.key==='Enter')saveKey()});
+document.getElementById('url-inp').addEventListener('keydown',e=>{if(e.key==='Enter')browserGo()});
+
+// Keyboard shortcut: Alt+V = voice HUD
+document.addEventListener('keydown',e=>{
+  if(e.altKey&&e.key==='v'){e.preventDefault();openVHUD()}
+  if(e.altKey&&e.key==='c'){e.preventDefault();if(!camActive)toggleCam();else captureDescribe()}
+  if(e.key==='Escape'&&vHUDOpen)closeVHUD();
+});
+
+// ── EXPOSE ──
+Object.assign(window,{
+  toggleCam,stopCam,doSnap,captureDescribe,
+  doClipboard,doPaste,doGPS,doBattery,doNetwork,doStorage,doDateTime,doScreen,doDevice,doNotify,doScreenshot,
+  openFiles,doFullscreen,
+  confirmShutdown,confirmRestart,confirmLogout,
+  openApp,browserLoad,browserGo,browserNav,browserReload,browserAsk,
+  openVHUD,closeVHUD,submitVoice,clearVoice,
+  toggleWake,toggleCont,stopAllVoice,toggleTTS,
+  fire,send,openKeyModal,closeKeyModal,saveKey,closeSysModal,rmPend,
+  switchTab
+});
+</script>
+</body>
+</html>
